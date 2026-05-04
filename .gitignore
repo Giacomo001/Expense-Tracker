@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.log
+TestResults/
+
+# .NET secrets
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Environment variables
+.env
+.env.container
+
+# Angular
+client/node_modules/
+client/dist/
+client/.angular/cache/
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db

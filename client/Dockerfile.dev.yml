@@ -1,0 +1,24 @@
+FROM node:20
+
+# Create developer user
+ARG USERNAME=developer
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+# node:20 already has a "node" user with uid 1000, rename it
+RUN usermod -l $USERNAME node \
+    && usermod -d /home/$USERNAME -m $USERNAME \
+    && groupmod -n $USERNAME node
+
+RUN npm install -g @angular/cli --ignore-scripts
+
+WORKDIR /app
+RUN chown -R $USERNAME:$USERNAME /app
+
+USER $USERNAME
+
+COPY --chown=$USERNAME:$USERNAME package*.json ./
+RUN npm ci --ignore-scripts
+
+EXPOSE 4200
+CMD ["ng", "serve", "--host", "0.0.0.0", "--poll", "2000"]

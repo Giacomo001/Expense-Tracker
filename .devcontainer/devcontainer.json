@@ -1,0 +1,52 @@
+{
+  "name": "ExpenseTracker Dev",
+  "dockerComposeFile": "docker-compose.dev.yml",
+  "service": "api",
+  "workspaceFolder": "/workspace",
+
+  "mounts": [
+    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent,type=bind"
+  ],
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "/ssh-agent"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // C# e .NET
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        // Angular e TypeScript
+        "angular.ng-template",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        // Database
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        // Utilities
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[csharp]": {
+          "editor.defaultFormatter": "ms-dotnettools.csharp"
+        },
+        "dotnetAcquisitionExtension.sharedExistingDotnetInstallation": true
+      }
+    }
+  },
+
+  "postCreateCommand": "dotnet restore /workspace/ExpenseTracker.API/ExpenseTracker.API.csproj && cd /workspace/client && npm ci && npm audit --audit-level=high",
+
+  "forwardPorts": [8080, 4200, 5432],
+  "portsAttributes": {
+    "8080": { "label": "API" },
+    "4200": { "label": "Angular" },
+    "5432": { "label": "PostgreSQL" }
+  },
+
+  "remoteUser": "developer"
+}

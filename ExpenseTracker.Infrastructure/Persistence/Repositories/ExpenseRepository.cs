@@ -1,0 +1,38 @@
+using System;
+using ExpenseTracker.Application.Interfaces.Repositories;
+using ExpenseTracker.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace ExpenseTracker.Infrastructure.Persistence.Repositories;
+
+public class ExpenseRepository(AppDbContext context) : IExpenseRepository
+{
+    public async Task<IReadOnlyList<Expense>> GetAllExpensesByUserIdAsync(Guid userId, CancellationToken token = default)
+    {
+        return await context.Expenses
+            .Where(e => e.UserId == userId)
+            .OrderByDescending(e => e.Date)
+            .ToListAsync(token);
+    }
+
+    public async Task<Expense?> GetExpenseByIdAsync(Guid expenseId, Guid userId, CancellationToken token = default)
+    {
+        return await context.Expenses
+            .FirstOrDefaultAsync(e => e.UserId == userId && e.Id == expenseId, token);
+    }
+
+    public async Task CreateExpenseAsync(Expense expense, CancellationToken token = default)
+    {
+        await context.Expenses.AddAsync(expense, token);
+    }
+
+    public void UpdateExpense(Expense expense)
+    {
+        context.Expenses.Update(expense);
+    }
+
+    public void DeleteExpense(Expense expense)
+    {
+        context.Expenses.Remove(expense);
+    }
+}
