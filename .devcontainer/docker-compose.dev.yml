@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: ExpenseTracker.API/Dockerfile.dev
+    container_name: expensetracker_api_dev
+    env_file:
+      - ../.env
+      - ../.env.container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ..:/workspace:cached
+      - api_bin:/workspace/ExpenseTracker.API/bin
+      - api_obj:/workspace/ExpenseTracker.API/obj
+      - client_node_modules:/workspace/client/node_modules
+      - ~/.gitconfig:/home/developer/.gitconfig:ro
+      - ~/.ssh:/home/developer/.ssh:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    container_name: expensetracker_db_dev
+    env_file:
+      - ../.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  adminer:
+    image: adminer
+    container_name: expensetracker_adminer_dev
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data_dev:
+  api_bin:
+  api_obj:
+  client_node_modules:
