@@ -1,19 +1,18 @@
-# ENTITY FRAMEWORK
 migrate:
 	dotnet ef migrations add $(name) \
-		--project CentriSportivi.Infrastructure \
-		--startup-project API \
+		--project ExpenseTracker.Infrastructure \
+		--startup-project ExpenseTracker.API \
 		--output-dir Persistence/Migrations
 
 update:
 	dotnet ef database update \
-		--project CentriSportivi.Infrastructure \
-		--startup-project API
+		--project ExpenseTracker.Infrastructure \
+		--startup-project ExpenseTracker.API
 
 drop:
 	dotnet ef database drop \
-		--project CentriSportivi.Infrastructure \
-		--startup-project API
+		--project ExpenseTracker.Infrastructure \
+		--startup-project ExpenseTracker.API
 
 reset: drop
 	find . -path "*/Persistence/Migrations/*.cs" -delete
@@ -21,7 +20,7 @@ reset: drop
 	$(MAKE) update
 
 # GITHUB
-BRANCH = Sviluppo
+BRANCH = develop
 
 push:
 	git add .
