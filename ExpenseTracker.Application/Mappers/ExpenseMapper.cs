@@ -28,7 +28,8 @@ public static class ExpenseMapper
             Amount = expense.Amount,
             Description = expense.Description,
             Date = expense.Date,
-            CategoryId = expense.CategoryId
+            CategoryId = expense.CategoryId,
+            UserId = userId
         };
     }
 

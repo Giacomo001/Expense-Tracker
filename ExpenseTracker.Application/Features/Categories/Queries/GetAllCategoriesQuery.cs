@@ -19,9 +19,7 @@ public class GetAllCategoriesHandler(IUnitOfWork uow)
         CancellationToken cancellationToken)
     {
         //Fetches all categories for the given user from the repository
-        var categories = await uow.Categories.GetAllCategoriesByUserIdAsync(
-            request.UserId,
-            cancellationToken);
+        var categories = await uow.Categories.GetAllCategoriesByUserIdAsync(request.UserId, cancellationToken);
 
         //Maps domain entities to read DTOs and returns as a read-only list
         return categories

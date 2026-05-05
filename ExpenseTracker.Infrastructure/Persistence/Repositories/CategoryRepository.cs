@@ -25,12 +25,7 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
     {
         await context.Categories.AddAsync(category, token);
     }
-
-    public void UpdateCategory(Category category)
-    {
-        context.Categories.Update(category);
-    }
-
+    
     public void DeleteCategory(Category category)
     {
         context.Categories.Remove(category);
