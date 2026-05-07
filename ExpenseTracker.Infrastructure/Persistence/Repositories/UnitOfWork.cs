@@ -12,8 +12,8 @@ public class UnitOfWork(
     ) : IUnitOfWork
 {
     public ICategoryRepository Categories { get; } = new CategoryRepository(context);
-
     public IExpenseRepository Expenses { get; } = new ExpenseRepository(context);
+    public IRefreshTokenRepository Tokens { get; } = new RefreshTokenRepository(context);
 
     public async Task<bool> Complete(CancellationToken token = default)
     {
