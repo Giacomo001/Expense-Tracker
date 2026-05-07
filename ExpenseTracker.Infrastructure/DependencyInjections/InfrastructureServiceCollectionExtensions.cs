@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using ExpenseTracker.Infrastructure.Identity;
 using ExpenseTracker.Application.Interfaces.Repositories;
 using ExpenseTracker.Infrastructure.Persistence.Repositories;
+using ExpenseTracker.Application.Interfaces.Services;
+using ExpenseTracker.Infrastructure.Services;
 
 namespace ExpenseTracker.Infrastructure.DependencyInjections;
 
@@ -43,6 +45,11 @@ public static class InfrastructureServiceCollectionExtensions
         //Repositories Injection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+        //Services Injection
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IJwtService, JwtService>();        
 
         return services;
     }

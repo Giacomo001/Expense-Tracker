@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : IdentityDbContex
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
