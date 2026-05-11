@@ -30,7 +30,7 @@ public class ExpenseConfigurations : IEntityTypeConfiguration<Expense>
             .HasForeignKey(e => e.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Category>()
+        builder.HasOne<Category>(e => e.Category)
             .WithMany()
             .HasForeignKey(e => e.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);

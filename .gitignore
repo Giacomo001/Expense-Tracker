@@ -26,3 +26,4 @@ client/.angular/cache/
 # OS
 .DS_Store
 Thumbs.db
+ExpenseTracker.API/appsettings.json

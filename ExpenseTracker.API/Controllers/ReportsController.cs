@@ -13,7 +13,7 @@ public class ReportsController(IMediator mediator) : BaseApiController
     private Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     [HttpGet]
-    public async Task<IActionResult> GetSummary([FromBody] DateOnly from, [FromBody] DateOnly to, CancellationToken token)
+    public async Task<IActionResult> GetSummary([FromQuery] DateOnly from, [FromQuery] DateOnly to, CancellationToken token)
     {
         var result = await mediator.Send(new GetExpensesSummaryQuery(UserId, from, to), token);
 

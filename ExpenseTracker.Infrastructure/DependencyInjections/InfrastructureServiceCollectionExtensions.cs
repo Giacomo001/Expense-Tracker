@@ -18,7 +18,7 @@ public static class InfrastructureServiceCollectionExtensions
     {
         services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-        object value = services.AddIdentity<User, IdentityRole<Guid>>(opt =>
+        object value = services.AddIdentityCore<User>(opt =>
         {
             //Password
             opt.Password.RequireDigit = true;
@@ -36,6 +36,7 @@ public static class InfrastructureServiceCollectionExtensions
             //User
             opt.User.RequireUniqueEmail = true;
         })
+        .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
