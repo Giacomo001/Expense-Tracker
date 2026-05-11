@@ -120,7 +120,7 @@ public class AuthService(
             TokenHash = refreshTokenHash,
             UserId = user.Id,
             CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(int.Parse(config["Jwt__RefreshTokenExpirationDays"]!)),
+            ExpiresAt = DateTime.UtcNow.AddDays(int.Parse(config["Jwt:RefreshTokenExpirationDays"]!)),
             IsRevoked = false
         };
 

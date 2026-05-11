@@ -14,7 +14,7 @@ public class JwtService(IConfiguration config) : IJwtService
     public string GenerateToken(Guid userId, string email, string username)
     {
         //Credentials are created using the configuration key
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt__Key"]!));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
@@ -25,12 +25,12 @@ public class JwtService(IConfiguration config) : IJwtService
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var expiration = int.Parse(config["Jwt__ExpiresInMinutes"]!);
+        var expiration = int.Parse(config["Jwt:ExpiresInMinutes"]!);
 
         var token = new JwtSecurityToken
         (
-            issuer: config["Jwt__Issuer"],
-            audience: config["Jwt__Audience"],
+            issuer: config["Jwt:Issuer"],
+            audience: config["Jwt:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(expiration),
             signingCredentials: credentials

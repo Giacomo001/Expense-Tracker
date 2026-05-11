@@ -39,7 +39,13 @@
     }
   },
 
-  "postCreateCommand": "dotnet restore /workspace/ExpenseTracker.API/ExpenseTracker.API.csproj && cd /workspace/client && npm ci && npm audit --audit-level=high",
+  //"postCreateCommand": "dotnet restore /workspace/ExpenseTracker.API/ExpenseTracker.API.csproj && cd /workspace/client && npm ci && npm audit --audit-level=high",
+ "postCreateCommand": {
+    "ssh-config": "sudo apt-get update && sudo apt-get install -y openssh-client && mkdir -p /home/developer/.ssh && echo -e 'Host *\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_ed25519' > /home/developer/.ssh/config && chmod 600 /home/developer/.ssh/config",
+    "dotnet-restore": "dotnet restore /workspace/ExpenseTracker.API/ExpenseTracker.API.csproj",
+    "npm-install": "cd /workspace/client && npm ci",
+    "npm-audit": "cd /workspace/client && npm audit --audit-level=high"
+  },
 
   "forwardPorts": [8080, 4200, 5432],
   "portsAttributes": {
