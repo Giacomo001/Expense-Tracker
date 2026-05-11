@@ -23,3 +23,8 @@ public record AuthResponseDto
     string UserName,
     string Email
 );
+
+public record RefreshTokenDto
+(
+    string RefreshToken
+);

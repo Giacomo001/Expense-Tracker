@@ -29,7 +29,7 @@ public class AuthController(IAuthService authService) : BaseApiController
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] string refreshToken, CancellationToken token)
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshToken, CancellationToken token)
     {
         var result = await authService.RefreshTokenAsync(refreshToken, token);
 
@@ -40,7 +40,7 @@ public class AuthController(IAuthService authService) : BaseApiController
     }
 
     [HttpPost("revoke")]
-    public async Task<IActionResult> Revoke([FromBody] string refreshToken, CancellationToken token)
+    public async Task<IActionResult> Revoke([FromBody] RefreshTokenDto refreshToken, CancellationToken token)
     {
         var result = await authService.RevokeTokenAsync(refreshToken, token);
 
