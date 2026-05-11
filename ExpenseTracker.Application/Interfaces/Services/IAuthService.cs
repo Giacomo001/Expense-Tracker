@@ -7,6 +7,6 @@ public interface IAuthService
 {
     Task<ErrorOr<AuthResponseDto>> RegisterAsync(RegisterDto register, CancellationToken token = default);
     Task<ErrorOr<AuthResponseDto>> LoginAsync(LoginDto login, CancellationToken token = default);
-    Task<ErrorOr<AuthResponseDto>> RefreshTokenAsync(string refreshToken, CancellationToken token = default);
-    Task<ErrorOr<Deleted>> RevokeTokenAsync(string refreshToken, CancellationToken token = default);
+    Task<ErrorOr<AuthResponseDto>> RefreshTokenAsync(RefreshTokenDto dto, CancellationToken token = default);
+    Task<ErrorOr<Deleted>> RevokeTokenAsync(RefreshTokenDto dto, CancellationToken token = default);
 }

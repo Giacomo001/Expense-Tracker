@@ -73,9 +73,9 @@ public class AuthService(
         return await GenerateAuthResponseAsync(user, token);
     }
 
-    public async Task<ErrorOr<AuthResponseDto>> RefreshTokenAsync(string refreshToken, CancellationToken token = default)
+    public async Task<ErrorOr<AuthResponseDto>> RefreshTokenAsync(RefreshTokenDto dto, CancellationToken token = default)
     {
-        var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
+        var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(dto.RefreshToken)));
 
         var storedToken = await uow.Tokens.GetByTokenHashAsync(tokenHash, token);
         if(storedToken is null ||storedToken.ExpiresAt < DateTime.UtcNow)
@@ -92,9 +92,9 @@ public class AuthService(
         return await GenerateAuthResponseAsync(user, token);
     }
 
-    public async Task<ErrorOr<Deleted>> RevokeTokenAsync(string refreshToken, CancellationToken token = default)
+    public async Task<ErrorOr<Deleted>> RevokeTokenAsync(RefreshTokenDto dto, CancellationToken token = default)
     {
-        var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
+        var tokenHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(dto.RefreshToken)));
 
         var storedToken = await uow.Tokens.GetByTokenHashAsync(tokenHash, token);
         if(storedToken is null) return Error.NotFound("Auth.RevokeToken", "Token not found.");
