@@ -19,7 +19,7 @@ public class CreateCategoryHandler(
     public async Task<ErrorOr<CategoryReadDto>> Handle(CreateCategoryCommand request, CancellationToken token)
     {
         var validationResult = await createValidator.ValidateAsync(request.Dto, token);
-        //If fails, it shows the errors
+        //If fails, it shows the errors as a list
         if(!validationResult.IsValid)
         {
             return validationResult.Errors
