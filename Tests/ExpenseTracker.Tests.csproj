@@ -26,4 +26,8 @@
     <ProjectReference Include="..\ExpenseTracker.Domain\ExpenseTracker.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features/Reports/" />
+  </ItemGroup>
+
 </Project>

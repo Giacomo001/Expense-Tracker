@@ -36,7 +36,7 @@ public class DeleteCategoryCommandTests
         //Assert
         result.IsError.Should().BeTrue();
         result.FirstError.Type.Should().Be(ErrorType.NotFound);
-        result.FirstError.Code.Should().Be("Category.Delete");
+        result.FirstError.Code.Should().Be("Category.NotFound");
         result.FirstError.Description.Should().Be("The category was not found.");
         uow.Categories.DidNotReceive().DeleteCategory(Arg.Any<Category>());
         await uow.DidNotReceive().Complete(token);
