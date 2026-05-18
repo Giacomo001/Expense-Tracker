@@ -1,0 +1,47 @@
+@use "tailwindcss";
+
+@theme {
+  /********* PRIMARY — Blue *********/
+  --color-primary: #2563EB;
+  --color-primary-light: #60A5FA;
+  --color-primary-dark: #1D4ED8;
+
+  /********* ACCENT — Cyan *********/
+  --color-accent: #0891B2;
+  --color-accent-soft: #E0F2FE;
+  --color-accent-hover: #0E7490;
+
+  /********* SECONDARY — Slate *********/
+  --color-secondary: #475569;
+  --color-secondary-light: #94A3B8;
+  --color-secondary-dark: #1E293B;
+
+  /********* NEUTRALS *********/
+  --color-background-main: #F8FAFC;
+  --color-gray-50: #F8FAFC;
+  --color-gray-100: #F1F5F9;
+  --color-gray-200: #E2E8F0;
+  --color-gray-700: #334155;
+  --color-gray-900: #0F172A;
+
+  /********* FEEDBACK *********/
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+  --color-info: #2563EB;
+  --color-neutral: #64748B;
+  --color-disable: #CBD5E1;
+
+  /********* FEEDBACK LIGHT *********/
+  --color-success-light: #DCFCE7;
+  --color-warning-light: #FEF3C7;
+  --color-error-light: #FEE2E2;
+  --color-info-light: #DBEAFE;
+  --color-neutral-light: #F1F5F9;
+
+  /********* SPACING *********/
+  --spacing-xs: 0.8rem;
+
+  /********* FONT *********/
+  --font-sans: 'Inter', sans-serif;
+}
