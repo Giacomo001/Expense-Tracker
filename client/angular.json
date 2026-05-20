@@ -50,7 +50,8 @@
             ],
             "styles": [
               "src/styles/tailwind.scss",
-              "src/styles/styles.scss"
+              "src/styles/styles.scss",
+              "node_modules/ngx-toastr/toastr.css"
             ]
           },
           "configurations": {
