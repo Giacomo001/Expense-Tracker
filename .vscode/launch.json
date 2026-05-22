@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C# Backend",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/ExpenseTracker.API/bin/Debug/net10.0/ExpenseTracker.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/ExpenseTracker.API",
+      "stopAtEntry": false,
+      "launchSettingsProfile": "container",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://0.0.0.0:5069"
+      }
+    },
+    {
+      "name": "Angular Frontend (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "ng serve",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/client/src",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${webRoot}/*",
+        "webpack:///src/*": "${webRoot}/*",
+        "webpack:///*": "*"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack Debug",
+      "configurations": ["C# Backend", "Angular Frontend (Chrome)"],
+      "stopAll": true
+    }
+  ]
+}

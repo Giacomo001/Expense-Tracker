@@ -1,6 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
-@use '_variables.scss';
 @use 'ngx-toastr/toastr';
 
 html, body {
@@ -17,10 +16,18 @@ html {
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
-      typography: Roboto,
+      typography: Inter,
       density: 0,
     )
   );
+}
+
+:root {
+  --mat-form-field-focus-active-indicator-color: #185FA5;
+  --mat-form-field-label-text-color: #475569;
+  --mdc-outlined-text-field-focus-outline-color: #185FA5;
+  --mdc-outlined-text-field-focus-label-text-color: #185FA5;
+  --mat-icon-color: #185FA5;
 }
 
 body {
@@ -39,4 +46,8 @@ body {
   // Reset the user agent margin.
   margin: 0;
   height: 100%;
+}
+
+.bg-primary {
+  --mat-icon-color: white;
 }
