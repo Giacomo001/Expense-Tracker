@@ -1,1 +1,124 @@
-<p>login works!</p>
+<div class="grid grid-cols-2 h-screen">
+    <!-- LEFT PANEL -->
+    <div class="bg-primary flex flex-col justify-between px-6 py-2">
+        <div class="flex items-center gap-3">
+            <img src="cointrol-logo-dark.png" alt="Cointrol" class="h-16" />
+        </div>
+
+        <div class="flex flex-col gap-3" style="margin-bottom: -5rem;">
+            <h1 class="text-white text-3xl font-medium leading-snug">
+                Take control of your finances
+            </h1>
+            <p class="text-white/80 text-sm leading-relaxed">
+                Track expenses, manage categories and get insights
+                on your spending habits — all in one place.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 justify-evenly">
+            <div class="bg-white/10 border border-white/15 rounded-lg p-4 flex flex-col justify-center min-h-16">
+                <span class="text-white text-xl font-medium">€ 2,840</span>
+                <p class="text-white/80 text-xs mt-1">Tracked this month</p>
+            </div>
+            <div class="bg-white/10 border border-white/15 rounded-lg p-4 flex flex-col justify-center min-h-16">
+                <span class="text-white text-xl font-medium">12</span>
+                <p class="text-white/80 text-xs mt-1">Categories</p>
+            </div>
+            <div class="bg-white/10 border border-white/15 rounded-lg p-4 flex flex-col justify-center min-h-16">
+                <span class="text-white text-xl font-medium">94</span>
+                <p class="text-white/80 text-xs mt-1">Expenses logged</p>
+            </div>
+            <div class="bg-white/10 border border-white/15 rounded-lg p-4 flex flex-col justify-center min-h-16">
+                <span class="text-white text-xl font-medium">€ 91.6</span>
+                <p class="text-white/80 text-xs mt-1">Daily average</p>
+            </div>
+
+            <!-- GRAPHS -->
+            <div class="bg-white/10 border border-white/15 rounded-lg p-4">
+                <p class="text-white/80 text-xs mb-3">February 2026</p>
+                <div class="relative h-20 w-20 mx-auto">
+                    <canvas baseChart [data]="februaryData" [options]="donutOptions" type="doughnut"></canvas>
+                </div>
+                <div class="flex flex-col gap-1 mt-3">
+                @for (label of februaryData.labels!; track label; let i = $index) {
+                    <div class="flex items-center gap-2 text-xs text-white/70">
+                        <span class="w-2 h-2 rounded-full flex-shrink-0" [style.background]="chartColors[i]"></span>
+                            {{ label }}
+                        <span class="ml-auto text-white/90 font-medium">{{ februaryData.datasets[0].data[i] }}%</span>
+                    </div>
+                }
+                </div>
+            </div>
+
+            <div class="bg-white/10 border border-white/15 rounded-lg p-4">
+                <p class="text-white/80 text-xs mb-3">Full year 2025</p>
+                <div class="relative h-20 w-20 mx-auto">
+                    <canvas baseChart [data]="yearData" [options]="donutOptions" type="doughnut"></canvas>
+                </div>
+                <div class="flex flex-col gap-1 mt-3">
+                @for (label of yearData.labels!; track label; let i = $index) {
+                    <div class="flex items-center gap-2 text-xs text-white/70">
+                        <span class="w-2 h-2 rounded-full flex-shrink-0" [style.background]="chartColors[i]"></span>
+                        {{ label }}
+                        <span class="ml-auto text-white/90 font-medium">{{ yearData.datasets[0].data[i] }}%</span>
+                    </div>
+                }
+                </div>
+            </div>
+        </div>
+        <span class="text-white text-xs">© 2026 Cointrol — Expense Tracker</span>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="bg-white flex flex-col justify-center px-12 gap-8">
+        <div class="flex flex-col gap-2">
+        <h2 class="text-gray-900 text-2xl font-medium">Welcome back</h2>
+        <p class="text-gray-700 text-sm">Sign in to your account to continue</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="login()" class="flex flex-col gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Username</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input class="border-[var(--color-primary)]" matInput type="text" formControlName="userName" placeholder="JohnDoe88" />
+            @if (loginForm.get('userName')?.hasError('required') && loginForm.get('userName')?.touched) {
+            <mat-error>Username is required</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Password</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" />
+            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+            <mat-error>Password is required</mat-error>
+            }
+            @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
+            <mat-error>Password must be at least 8 characters</mat-error>
+            }
+        </mat-form-field>
+
+        <button type="submit" [disabled]="loginForm.invalid"
+            class="w-full h-10 bg-primary text-white rounded-lg text-sm font-medium 
+            flex items-center justify-center gap-2 cursor-pointer
+            disabled:opacity-50 disabled:cursor-not-allowed">
+            Sign in
+            <mat-icon matSuffix>arrow_forward</mat-icon>
+        </button>
+        </form>
+
+        <div class="flex items-center gap-3">
+            <span class="flex-1 h-px bg-gray-200"></span>
+            <span class="text-xs text-gray-700">Don't have an account?</span>
+            <span class="flex-1 h-px bg-gray-200"></span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2">
+            <span class="text-sm text-gray-700">New to Cointrol?</span>
+            <a routerLink="/auth/register" class="text-sm text-primary font-medium">Create an account</a>
+        </div>
+    </div>
+</div>

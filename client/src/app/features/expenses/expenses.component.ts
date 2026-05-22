@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ToastrService } from 'ngx-toastr';
 import { ExpensesService } from './services/expenses.service';
 import { LoadingService } from '@core/services/loading/loading.service';
 import { ExpenseRead } from './models/expense.model';
+import { ToastService } from '@core/services/toast/toast.service';
 
 @Component({
   selector: 'app-expenses',
@@ -17,7 +17,7 @@ export class ExpensesComponent implements OnInit {
   // INJECT
   // ============================================================
   private expenseService = inject(ExpensesService);
-  private toastr = inject(ToastrService);
+  private toast = inject(ToastService);
   private loading = inject(LoadingService);
   private dialog = inject(MatDialog);
   
@@ -44,7 +44,7 @@ export class ExpensesComponent implements OnInit {
         this.isSkeletonLoading.set(false);
       },
       error: () => {
-        this.toastr.error("There was an error during the load of the expenses");
+        this.toast.error("There was an error during the load of the expenses");
         this.isSkeletonLoading.set(false);
       }
     })
