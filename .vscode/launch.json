@@ -13,7 +13,7 @@
       "launchSettingsProfile": "container",
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://0.0.0.0:5069"
+        "ASPNETCORE_URLS": "http://0.0.0.0:8080"
       }
     },
     {

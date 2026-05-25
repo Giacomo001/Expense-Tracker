@@ -78,11 +78,11 @@
 
         <form [formGroup]="loginForm" (ngSubmit)="login()" class="flex flex-col gap-4">
         <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Username</mat-label>
+            <mat-label>Email</mat-label>
             <mat-icon matPrefix>person</mat-icon>
-            <input class="border-[var(--color-primary)]" matInput type="text" formControlName="userName" placeholder="JohnDoe88" />
-            @if (loginForm.get('userName')?.hasError('required') && loginForm.get('userName')?.touched) {
-            <mat-error>Username is required</mat-error>
+            <input class="border-[var(--color-primary)]" matInput type="email" formControlName="email" placeholder="john.doe@test.test" />
+            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
+            <mat-error>Email is required</mat-error>
             }
         </mat-form-field>
 

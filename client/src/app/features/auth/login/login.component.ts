@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth/auth.service';
-import { LoadingService } from '@core/services/loading/loading.service';
 import { ToastService } from '@core/services/toast/toast.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -27,7 +26,6 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-  private loadingService = inject(LoadingService);
   
   // ============================================================
   // PROPERTIES
@@ -81,7 +79,7 @@ export class LoginComponent implements OnInit {
   // ============================================================
   private initializeForm() {
     this.loginForm = this.fb.group({
-      userName: ['', Validators.required],
+      email: ['', [Validators.email, Validators.required]],
       password: [
         '',
         [

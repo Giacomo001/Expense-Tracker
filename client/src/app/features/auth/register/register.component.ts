@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth/auth.service';
-import { LoadingService } from '@core/services/loading/loading.service';
 import { ToastService } from '@core/services/toast/toast.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,7 +23,6 @@ export class RegisterComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-  private loadingService = inject(LoadingService);
   
   // ============================================================
   // SIGNALS
@@ -90,7 +88,7 @@ export class RegisterComponent implements OnInit {
       }
     ).subscribe({
       next: () => {
-        this.router.navigateByUrl('/login');
+        this.router.navigateByUrl('/auth/login');
         this.registerForm.reset();
       }
     });

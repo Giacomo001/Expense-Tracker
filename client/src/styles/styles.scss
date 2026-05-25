@@ -1,6 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
-@use 'ngx-toastr/toastr';
 
 html, body {
   width: 100%;
@@ -50,4 +49,33 @@ body {
 
 .bg-primary {
   --mat-icon-color: white;
+}
+
+/************** TOASTR **************/
+.custom-success {
+  background-color: var(--color-success) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+.custom-error {
+  background-color: var(--color-error) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+.custom-warning {
+  background-color: var(--color-warning) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+.custom-loading {
+  background-color: var(--color-info) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
 }
