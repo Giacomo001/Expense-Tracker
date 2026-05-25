@@ -1,36 +1,33 @@
 import { inject, Injectable } from '@angular/core';
-import { HotToastService } from '@ngxpert/hot-toast';
-import { Observable } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ToastService {
-  private toast = inject(HotToastService);
+  private toast = inject(ToastrService);
 
   success(message: string) {
-    this.toast.success(message, {
-      duration: 3000,
-      position: "bottom-right",
-      className: "custom-success"
+    this.toast.success(message, undefined, {
+      timeOut: 3000,
+      positionClass: 'toast-bottom-right'
     });
   }
 
   error(message: string) {
-    this.toast.error(message, {
-      duration: 3000,
-      position: "bottom-right",
-      autoClose: false,
-      className: "custom-error"
+    this.toast.error(message, undefined, {
+      disableTimeOut: true,
+      positionClass: 'toast-bottom-right',
+      closeButton: true
     });
   }
 
   warning(message: string) {
-    this.toast.warning(message, {
-      duration: 3000,
-      position: "bottom-right",
-      autoClose: false,
-      className: "custom-warning"
+    this.toast.warning(message, undefined, {
+      disableTimeOut: true,
+      positionClass: 'toast-bottom-right',
+      closeButton: true
     });
   }
 
@@ -38,12 +35,25 @@ export class ToastService {
     loading: string;
     success: string;
     error: string | ((err: any) => string);
-  }) {
+  }): Observable<T> {
+    const loadingToast = this.toast.info(messages.loading, undefined, {
+      disableTimeOut: true,
+      positionClass: 'toast-bottom-right',
+      closeButton: true
+    });
+
     return obs$.pipe(
-      this.toast.observe({
-        loading: { content: messages.loading, position: 'bottom-right', className: 'custom-loading' },
-        success: { content: messages.success, position: 'bottom-right', className: 'custom-success' },
-        error: { content: messages.error, position: 'bottom-right', className: 'custom-error' },
+      tap(() => {
+        this.toast.remove(loadingToast.toastId);
+        this.success(messages.success);
+      }),
+      catchError((err) => {
+        this.toast.remove(loadingToast.toastId);
+        const errorMsg = typeof messages.error === 'function'
+          ? messages.error(err)
+          : messages.error;
+        this.error(errorMsg);
+        return throwError(() => err);
       })
     );
   }

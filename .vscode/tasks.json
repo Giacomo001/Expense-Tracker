@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/API/ExpenseTracker.API.csproj",
+        "${workspaceFolder}/ExpenseTracker.API/ExpenseTracker.API.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
