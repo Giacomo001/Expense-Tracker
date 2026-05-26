@@ -103,8 +103,8 @@ export class LoginComponent implements OnInit {
         error: (err) => err?.error?.message ?? 'There was an error during the login'
       }
     ).subscribe({
-      next: () => {
-        this.router.navigateByUrl('/');
+      next: async () => {
+        await this.router.navigateByUrl('/');
         this.loginForm.reset();
       }
     });

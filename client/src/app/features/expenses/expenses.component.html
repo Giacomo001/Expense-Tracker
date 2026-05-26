@@ -1,4 +1,164 @@
-@for(expense of expensesList(); track expense.id) {
-    <p>{{expense.date}}</p>
-    Expense 1
-}
+<div class="grid grid-cols-[190px_1fr_210px] h-screen overflow-hidden">
+  <!-- SIDEBAR — CATEGORIES -->
+  <aside class="bg-white border-r border-gray-200 flex flex-col gap-1 p-3 overflow-y-auto">
+    <span class="text-xs text-secondary-light uppercase tracking-widest px-2 mb-2">Categories</span>
+
+    <!-- All pill -->
+    <div (click)="selectedCategoryId.set(null)"
+      class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all"
+      [class.bg-info-light]="selectedCategoryId() === null"
+      [class.border-primary-light]="selectedCategoryId() === null"
+      [class.text-primary-dark]="selectedCategoryId() === null"
+      [class.font-medium]="selectedCategoryId() === null"
+      [class.border-transparent]="selectedCategoryId() !== null"
+      [class.text-secondary]="selectedCategoryId() !== null">
+      <span class="w-2 h-2 rounded-full bg-primary flex-shrink-0"></span>
+      All
+      <span class="ml-auto text-xs">€ {{ expensesList() | sum | number:'1.2-2' }}</span>
+    </div>
+
+    <!-- Category pills -->
+    @for (category of categoriesList(); track category.id) {
+      <div (click)="selectedCategoryId.set(category.id)"
+        class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all"
+        [class.bg-info-light]="selectedCategoryId() === category.id"
+        [class.border-primary-light]="selectedCategoryId() === category.id"
+        [class.text-primary-dark]="selectedCategoryId() === category.id"
+        [class.font-medium]="selectedCategoryId() === category.id"
+        [class.border-transparent]="selectedCategoryId() !== category.id"
+        [class.text-secondary]="selectedCategoryId() !== category.id">
+        <span class="w-2 h-2 rounded-full bg-accent flex-shrink-0"></span>
+        {{ category.name }}
+        <span class="ml-auto text-xs">
+          € {{ expensesList() | sum:category.id | number:'1.2-2' }}
+        </span>
+      </div>
+    }
+
+    <!-- Add category -->
+    <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-secondary-light border border-dashed border-gray-200 mt-2 cursor-pointer">
+      <mat-icon class="text-base">add</mat-icon>
+      Add category
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex flex-col gap-3 p-4 overflow-y-auto bg-gray-50">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium text-gray-900">
+        {{ currentMonthLabel }}
+      </span>
+      <button class="flex items-center gap-1 px-3 py-1.5 bg-primary text-white rounded-lg text-xs cursor-pointer border-none">
+        <mat-icon class="text-sm">add</mat-icon>
+        Add expense
+      </button>
+    </div>
+
+    <!-- Summary bar -->
+    <div class="bg-white border border-gray-200 rounded-lg px-4 py-3 flex justify-between items-center">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-xs text-secondary-light">Total this month</span>
+        <span class="text-base font-medium text-primary">
+          € {{ grandTotal() | number:'1.2-2' }}
+        </span>
+      </div>
+      <div class="flex flex-col gap-0.5 text-center">
+        <span class="text-xs text-secondary-light">Expenses</span>
+        <span class="text-base font-medium text-gray-900">{{ expensesList().length }}</span>
+      </div>
+      <div class="flex flex-col gap-0.5 text-right">
+        <span class="text-xs text-secondary-light">Daily avg</span>
+        <span class="text-base font-medium text-gray-900">
+          € {{ dailyAverage() | number:'1.2-2' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Skeleton loading -->
+    @if (isSkeletonLoading()) {
+      <div class="flex flex-col gap-2">
+        @for (i of [1,2,3,4,5]; track i) {
+          <div class="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3 animate-pulse">
+            <div class="w-8 h-8 rounded-lg bg-gray-100"></div>
+            <div class="flex-1 flex flex-col gap-1">
+              <div class="h-3 bg-gray-100 rounded w-1/3"></div>
+              <div class="h-2 bg-gray-100 rounded w-1/5"></div>
+            </div>
+            <div class="h-3 bg-gray-100 rounded w-16"></div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty state -->
+    @else if (filteredExpenses().length === 0) {
+      <div class="flex flex-col items-center justify-center flex-1 gap-3 py-16 text-center">
+        <div class="w-12 h-12 rounded-xl bg-info-light flex items-center justify-center">
+          <mat-icon class="text-primary">receipt_long</mat-icon>
+        </div>
+        <p class="text-sm font-medium text-gray-900">No expenses yet</p>
+        <p class="text-xs text-secondary-light">Add your first expense to start tracking</p>
+      </div>
+    }
+
+    <!-- Expense list grouped by date -->
+    @else {
+      @for (expense of filteredExpenses(); track expense.id) {
+        <div class="bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-3 cursor-pointer hover:border-primary-light transition-all">
+          <div class="w-8 h-8 rounded-lg bg-info-light flex items-center justify-center flex-shrink-0">
+            <mat-icon class="text-primary text-sm">receipt</mat-icon>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-medium text-gray-900 truncate">
+              {{ expense.description ?? expense.categoryName }}
+            </p>
+            <p class="text-[11px] text-secondary-light mt-0.5">{{ expense.categoryName }}</p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="text-sm font-medium text-gray-700">- € {{ expense.amount | number:'1.2-2' }}</p>
+            <p class="text-[10px] text-secondary-light mt-0.5">{{ expense.date | date:'d MMM':'':'it-IT' }}</p>
+          </div>
+        </div>
+      }
+    }
+  </main>
+
+  <!-- CALENDAR PANEL -->
+  <aside class="bg-white border-l border-gray-200 p-3 overflow-y-auto flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-gray-900">{{ currentMonthLabel }}</span>
+        <span class="text-xs text-secondary-light">€ {{ grandTotal() | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="grid grid-cols-7 gap-0.5">
+        @for (day of ['M','T','W','T','F','S','S']; track $index) {
+          <span class="text-center text-[9px] text-secondary-light py-0.5">{{ day }}</span>
+        }
+
+        @for (empty of calendarEmptyCells; track $index) {
+          <span></span>
+        }
+
+        @for (day of calendarDays(); track day.date) {
+          <div class="w-[22px] h-[22px] mx-auto rounded flex items-center justify-center text-[10px] relative cursor-pointer"
+            [class.bg-primary]="isSelectedDay(day.date)"
+            [class.text-white]="isSelectedDay(day.date)"
+            [class.font-medium]="isSelectedDay(day.date)"
+            [class.text-secondary]="!isSelectedDay(day.date)"
+            (click)="selectedDate.set(currentYear + '-' + currentMonth.toString().padStart(2, '0') + '-' + day.date.toString().padStart(2, '0'))">
+            {{ day.date }}
+            @if (day.hasExpense) {
+              <span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                [class.bg-accent]="!day.isToday"
+                [class.bg-white]="day.isToday">
+              </span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </aside>
+</div>
