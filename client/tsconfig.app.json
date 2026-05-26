@@ -5,6 +5,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "rootDir": "./src",
+    "inlineSources": true,
+    "inlineSourceMap": true,
     "types": []
   },
   "include": [

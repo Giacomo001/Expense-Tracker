@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 import { ExpenseCreate, ExpenseRead, ExpenseUpdate } from '../models/expense.model';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root',

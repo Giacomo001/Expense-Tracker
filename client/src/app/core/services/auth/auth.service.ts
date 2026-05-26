@@ -3,11 +3,11 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AccountService } from '../account/account.service';
 import { TokenService } from '../token/token.service';
-import { environment } from '@env/environment.development';
 import { LoginRequest, RegisterRequest } from '@features/auth/models/auth-request.model';
 import { Observable, tap } from 'rxjs';
 import { AuthResponse } from '@features/auth/models/auth-response.model';
 import { LoggedUser } from '@features/auth/models/logged-user.model';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -59,8 +59,5 @@ export class AuthService {
       email: response.email
     };
     this.accountService.setLoggedUser(user);
-
-    //Navigates to home
-    this.router.navigateByUrl('/');
   }
 }

@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { environment } from '@env/environment.development';
 import { LoggedUser } from '@features/auth/models/logged-user.model';
 import { TokenService } from '../token/token.service';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root',
