@@ -4,7 +4,8 @@ namespace ExpenseTracker.Application.DTOs;
 
 public record CategoryReadDto(
     Guid Id,
-    string Name
+    string Name,
+    string Color
 );
 
 public record CategoryCreateDto(

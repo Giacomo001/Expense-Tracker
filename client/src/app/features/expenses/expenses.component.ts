@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ExpensesService } from './services/expenses.service';
-import { LoadingService } from '@core/services/loading/loading.service';
 import { ExpenseRead } from './models/expense.model';
 import { ToastService } from '@core/services/toast/toast.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +9,7 @@ import { forkJoin, shareReplay } from 'rxjs';
 import { CategoriesService } from '@features/categories/services/categories.service';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { SumPipe } from '@shared/pipes/sum.pipe';
-import { buildCalendarDays, getDaysInMonth, getTodayString, toDateString } from '@shared/utils/calendar.utils';
+import { buildCalendarDays, getDaysInMonth, getFirstDayOfMonth, getMonthLabel, getNextMonth, getPreviousMonth, getTodayString, toDateString } from '@shared/utils/calendar.utils';
 
 @Component({
   selector: 'app-expenses',
@@ -37,13 +36,6 @@ export class ExpensesComponent implements OnInit {
   protected readonly currentYear = this.today.getFullYear();
   protected readonly currentMonthLabel = this.today.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
-  protected readonly calendarEmptyCells = Array.from({
-    length: (() => {
-      const day = new Date(this.currentYear, this.currentMonth - 1, 1).getDay();
-      return day === 0 ? 6 : day - 1;
-    })()
-  }, (_, i) => i);
-
   //============================================================
   // SIGNALS
   //============================================================
@@ -51,25 +43,82 @@ export class ExpensesComponent implements OnInit {
   protected categoriesList = signal<CategoryRead[]>([]);
   protected isSkeletonLoading = signal<boolean>(true);
   protected selectedCategoryId = signal<string | null>(null);
-
   protected selectedDate = signal<string>(getTodayString());
 
-  protected calendarDays = signal(
-    buildCalendarDays(this.currentYear, this.currentMonth)
-  );
+  //Navigable calendar — starts at current month
+  protected viewYear = signal(this.currentYear);
+  protected viewMonth = signal(this.currentMonth);
 
   //============================================================
   // COMPUTED
   //============================================================
+  protected viewMonthLabel = computed(() =>
+    getMonthLabel(this.viewYear(), this.viewMonth())
+  );
+
+  protected viewCalendarDays = computed(() =>
+    buildCalendarDays(this.viewYear(), this.viewMonth()).map(day => ({
+      ...day,
+      hasExpense: this.expensesList().some(e =>
+        e.date.toString().split('T')[0] === toDateString(this.viewYear(), this.viewMonth(), day.date)
+      )
+    }))
+  );
+
+  protected viewEmptyCells = computed(() =>
+    Array.from({ length: getFirstDayOfMonth(this.viewYear(), this.viewMonth()) }, (_, i) => i)
+  );
+
+  //Month above — previous
+  protected prevMonthData = computed(() => getPreviousMonth(this.viewYear(), this.viewMonth()));
+  protected prevMonthLabel = computed(() => getMonthLabel(this.prevMonthData().year, this.prevMonthData().month));
+  protected prevMonthCalendarDays = computed(() =>
+    buildCalendarDays(this.prevMonthData().year, this.prevMonthData().month).map(day => ({
+      ...day,
+      hasExpense: this.expensesList().some(e =>
+        e.date.toString().split('T')[0] === toDateString(this.prevMonthData().year, this.prevMonthData().month, day.date)
+      )
+    }))
+  );
+  protected prevMonthEmptyCells = computed(() =>
+    Array.from({ length: getFirstDayOfMonth(this.prevMonthData().year, this.prevMonthData().month) }, (_, i) => i)
+  );
+  protected prevMonthTotal = computed(() =>
+    this.expensesList()
+      .filter(e => {
+        const [y, m] = e.date.toString().split('-').map(Number);
+        return y === this.prevMonthData().year && m === this.prevMonthData().month;
+      })
+      .reduce((sum, e) => sum + e.amount, 0)
+  );
+
+  //Month below — next
+  protected nextMonthData = computed(() => getNextMonth(this.viewYear(), this.viewMonth()));
+  protected nextMonthLabel = computed(() => getMonthLabel(this.nextMonthData().year, this.nextMonthData().month));
+  protected nextMonthCalendarDays = computed(() =>
+    buildCalendarDays(this.nextMonthData().year, this.nextMonthData().month).map(day => ({
+      ...day,
+      hasExpense: this.expensesList().some(e =>
+        e.date.toString().split('T')[0] === toDateString(this.nextMonthData().year, this.nextMonthData().month, day.date)
+      )
+    }))
+  );
+  protected nextMonthEmptyCells = computed(() =>
+    Array.from({ length: getFirstDayOfMonth(this.nextMonthData().year, this.nextMonthData().month) }, (_, i) => i)
+  );
+  protected nextMonthTotal = computed(() =>
+    this.expensesList()
+      .filter(e => {
+        const [y, m] = e.date.toString().split('-').map(Number);
+        return y === this.nextMonthData().year && m === this.nextMonthData().month;
+      })
+      .reduce((sum, e) => sum + e.amount, 0)
+  );
 
   //Expenses filtered by selected date and category
   protected filteredExpenses = computed(() => {
     const date = this.selectedDate();
     const categoryId = this.selectedCategoryId();
-
-    console.log('selectedDate:', date);
-    console.log('expense dates:', this.expensesList().map(e => e.date.toString().split('T')[0]));
-
     return this.expensesList().filter(e => {
       const expenseDate = e.date.toString().split('T')[0];
       const datesMatch = expenseDate === date;
@@ -78,6 +127,7 @@ export class ExpensesComponent implements OnInit {
     });
   });
 
+  //Total of all expenses in current month
   protected grandTotal = computed(() =>
     this.expensesList().reduce((sum, e) => sum + e.amount, 0)
   );
@@ -105,7 +155,6 @@ export class ExpensesComponent implements OnInit {
       next: ({ expenses, categories }) => {
         this.expensesList.set(expenses);
         this.categoriesList.set(categories);
-        this.updateCalendar(expenses);
         this.isSkeletonLoading.set(false);
       },
       error: () => {
@@ -115,25 +164,33 @@ export class ExpensesComponent implements OnInit {
     });
   }
 
-  //Updates calendar dots based on expenses
-  private updateCalendar(expenses: ExpenseRead[]) {
-    this.calendarDays.update(days => days.map(day => ({
-      ...day,
-      hasExpense: expenses.some(e =>
-        e.date.toString().split('T')[0] === toDateString(this.currentYear, this.currentMonth, day.date)
-      )
-    })));
+  protected onDayClick(day: number, year: number, month: number) {
+    this.selectedDate.set(toDateString(year, month, day));
+    //If clicking prev/next month, navigate the calendar to that month
+    if (year !== this.viewYear() || month !== this.viewMonth()) {
+      this.viewYear.set(year);
+      this.viewMonth.set(month);
+    }
   }
 
-  //Called when a day is clicked on the calendar
-  protected onDayClick(day: number) {
-    const date = toDateString(this.currentYear, this.currentMonth, day);
-    console.log('selectedDate set to:', date);
-    this.selectedDate.set(date);
+  protected isSelectedDay(day: number, year: number, month: number): boolean {
+    return this.selectedDate() === toDateString(year, month, day);
   }
 
-  //Returns true if the given day is the currently selected date
-  protected isSelectedDay(day: number): boolean {
-    return this.selectedDate() === toDateString(this.currentYear, this.currentMonth, day);
+  protected goToPrevMonth() {
+    const prev = getPreviousMonth(this.viewYear(), this.viewMonth());
+    this.viewYear.set(prev.year);
+    this.viewMonth.set(prev.month);
+  }
+
+  protected goToNextMonth() {
+    const next = getNextMonth(this.viewYear(), this.viewMonth());
+    this.viewYear.set(next.year);
+    this.viewMonth.set(next.month);
+  }
+
+  //It gets the color of the category
+  protected getCategoryColor(categoryId: string): string {
+    return this.categoriesList().find(c => c.id === categoryId)?.color ?? '#94A3B8';
   }
 }

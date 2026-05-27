@@ -1,6 +1,7 @@
 export interface CategoryRead {
     id: string,
-    name: string
+    name: string,
+    color: string
 }
 
 export interface CategoryCreate {

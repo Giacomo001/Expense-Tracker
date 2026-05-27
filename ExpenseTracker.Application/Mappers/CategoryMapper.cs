@@ -1,6 +1,7 @@
 using System;
 using ExpenseTracker.Application.DTOs;
 using ExpenseTracker.Domain.Entities;
+using ExpenseTracker.Application.Utils;
 
 namespace ExpenseTracker.Application.Mappers;
 
@@ -11,7 +12,8 @@ public static class CategoryMapper
         return new CategoryReadDto
         (
             Id: category.Id,
-            Name: category.Name
+            Name: category.Name,
+            Color: category.Color
         );
     }
 
@@ -21,7 +23,8 @@ public static class CategoryMapper
         {
             Id = Guid.NewGuid(),
             Name = category.Name,
-            UserId = userId
+            UserId = userId,
+            Color = ColorGeneratorService.Generate()
         };
     }
 

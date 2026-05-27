@@ -29,3 +29,18 @@ export function getTodayString(): string {
   const today = new Date();
   return toDateString(today.getFullYear(), today.getMonth() + 1, today.getDate());
 }
+
+//Methods to get the previous and the next months
+export function getPreviousMonth(year: number, month: number): { year: number; month: number } {
+  //If the current month is January, the previous month needs to be December of the previous year
+  return month === 1 ? { year: year - 1, month: 12 } : { year, month: month - 1 };
+}
+
+export function getNextMonth(year: number, month: number): { year: number; month: number } {
+  //If the current month is December, the next month needs to be January of next year
+  return month === 12 ? { year: year + 1, month: 1 } : { year, month: month + 1 };
+}
+
+export function getMonthLabel(year: number, month: number): string {
+  return new Date(year, month - 1, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+}
