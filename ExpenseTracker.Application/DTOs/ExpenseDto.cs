@@ -10,7 +10,8 @@ public record ExpenseReadDto(
     DateOnly Date,
     DateTime CreatedAt,
     Guid CategoryId,
-    string CategoryName
+    string CategoryName,
+    string CategoryColor
 );
 
 public record ExpenseCreateDto(

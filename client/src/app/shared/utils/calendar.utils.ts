@@ -41,6 +41,10 @@ export function getNextMonth(year: number, month: number): { year: number; month
   return month === 12 ? { year: year + 1, month: 1 } : { year, month: month + 1 };
 }
 
+export function getTwoMonthsAhead(year: number, month: number): { year: number; month: number } {
+  return month == 12 ? { year: year + 1, month: 2 } : { year, month: month + 2 };
+}
+
 export function getMonthLabel(year: number, month: number): string {
   return new Date(year, month - 1, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 }

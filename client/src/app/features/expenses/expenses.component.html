@@ -1,42 +1,9 @@
 <div class="grid grid-cols-[190px_1fr_210px] h-screen overflow-hidden">
   <!-- SIDEBAR — CATEGORIES -->
-  <aside class="bg-white border-r border-gray-200 flex flex-col gap-1 p-3 overflow-y-auto">
-    <span class="text-xs text-secondary-light uppercase tracking-widest px-2 mb-2">Categories</span>
-    <div (click)="selectedCategoryId.set(null)"
-      class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all"
-      [class.bg-info-light]="selectedCategoryId() === null"
-      [class.border-primary-light]="selectedCategoryId() === null"
-      [class.text-primary-dark]="selectedCategoryId() === null"
-      [class.font-medium]="selectedCategoryId() === null"
-      [class.border-transparent]="selectedCategoryId() !== null"
-      [class.text-secondary]="selectedCategoryId() !== null">
-      
-      <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: var(--color-primary)"></span>
-      All
-      <span class="ml-auto text-xs">€ {{ expensesList() | sum | number:'1.2-2' }}</span>
-    </div>
-
-    @for (category of categoriesList(); track category.id) {
-      <div (click)="selectedCategoryId.set(category.id)"
-        class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all"
-        [class.bg-info-light]="selectedCategoryId() === category.id"
-        [class.border-primary-light]="selectedCategoryId() === category.id"
-        [class.text-primary-dark]="selectedCategoryId() === category.id"
-        [class.font-medium]="selectedCategoryId() === category.id"
-        [class.border-transparent]="selectedCategoryId() !== category.id"
-        [class.text-secondary]="selectedCategoryId() !== category.id">
-
-        <span class="w-2 h-2 rounded-full flex-shrink-0" [style.background-color]="category.color"></span>
-        {{ category.name }}
-        <span class="ml-auto text-xs">€ {{ expensesList() | sum:category.id | number:'1.2-2' }}</span>
-      </div>
-    }
-
-    <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-secondary-light border border-dashed border-gray-200 mt-2 cursor-pointer">
-      <mat-icon class="text-base">add</mat-icon>
-      Add category
-    </div>
-  </aside>
+  <app-categories
+    [expensesList]="expensesList()"
+    (categorySelected)="selectedCategoryId.set($event)">
+  </app-categories>
 
   <!-- MAIN CONTENT -->
   <main class="flex flex-col gap-3 p-4 overflow-y-auto bg-gray-50">
@@ -88,9 +55,9 @@
       @for (expense of filteredExpenses(); track expense.id) {
         <div class="bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-3 cursor-pointer hover:border-primary-light transition-all">
           <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            [style.background-color]="getCategoryColor(expense.categoryId) + '20'">
+            [style.background-color]="expense.categoryColor + '20'">
             <span class="w-3 h-3 rounded-full"
-              [style.background-color]="getCategoryColor(expense.categoryId)">
+              [style.background-color]="expense.categoryColor">
             </span>
           </div>
           <div class="flex-1 min-w-0">
@@ -107,104 +74,8 @@
   </main>
 
   <!-- CALENDAR PANEL -->
-  <aside class="bg-white border-l border-gray-200 p-3 overflow-y-auto flex flex-col gap-4">
-    <!-- Navigation arrows -->
-    <div class="flex items-center justify-between">
-      <button (click)="goToPrevMonth()" class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition-all border-none bg-transparent cursor-pointer">
-        <mat-icon class="text-secondary-light text-sm">chevron_left</mat-icon>
-      </button>
-      <span class="text-xs font-medium text-gray-900 capitalize">{{ viewMonthLabel() }}</span>
-      <button (click)="goToNextMonth()" class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition-all border-none bg-transparent cursor-pointer">
-        <mat-icon class="text-secondary-light text-sm">chevron_right</mat-icon>
-      </button>
-    </div>
-
-    <!-- PREVIOUS MONTH -->
-    <div class="flex flex-col gap-2 opacity-40">
-      <div class="flex items-center justify-between">
-        <span class="text-[10px] font-medium text-gray-900 capitalize">{{ prevMonthLabel() }}</span>
-        <span class="text-[10px] text-secondary-light">€ {{ prevMonthTotal() | number:'1.2-2' }}</span>
-      </div>
-      <div class="grid grid-cols-7 gap-0.5">
-        @for (day of ['M','T','W','T','F','S','S']; track $index) {
-          <span class="text-center text-[8px] text-secondary-light py-0.5">{{ day }}</span>
-        }
-        @for (empty of prevMonthEmptyCells(); track $index) {
-          <span></span>
-        }
-        @for (day of prevMonthCalendarDays(); track day.date) {
-          <div class="w-[20px] h-[20px] mx-auto rounded flex items-center justify-center text-[9px] relative cursor-pointer text-secondary font-variant-numeric"
-            [class.bg-primary]="isSelectedDay(day.date, prevMonthData().year, prevMonthData().month)"
-            [class.text-white]="isSelectedDay(day.date, prevMonthData().year, prevMonthData().month)"
-            (click)="onDayClick(day.date, prevMonthData().year, prevMonthData().month)">
-            {{ day.date }}
-            @if (day.hasExpense) {
-              <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent"></span>
-            }
-          </div>
-        }
-      </div>
-    </div>
-
-    <hr class="border-gray-200">
-    <!-- CURRENT VIEW MONTH -->
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-medium text-gray-900 capitalize">{{ viewMonthLabel() }}</span>
-        <span class="text-xs text-secondary-light">€ {{ (expensesList() | sum) | number:'1.2-2' }}</span>
-      </div>
-      <div class="grid grid-cols-7 gap-0.5">
-        @for (day of ['M','T','W','T','F','S','S']; track $index) {
-          <span class="text-center text-[9px] text-secondary-light py-0.5">{{ day }}</span>
-        }
-        @for (empty of viewEmptyCells(); track $index) {
-          <span></span>
-        }
-        @for (day of viewCalendarDays(); track day.date) {
-          <div class="w-[22px] h-[22px] mx-auto rounded flex items-center justify-center text-[10px] relative cursor-pointer"
-            [class.bg-primary]="isSelectedDay(day.date, viewYear(), viewMonth())"
-            [class.text-white]="isSelectedDay(day.date, viewYear(), viewMonth())"
-            [class.font-medium]="isSelectedDay(day.date, viewYear(), viewMonth())"
-            [class.text-secondary]="!isSelectedDay(day.date, viewYear(), viewMonth())"
-            (click)="onDayClick(day.date, viewYear(), viewMonth())">
-            {{ day.date }}
-            @if (day.hasExpense) {
-              <span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                [class.bg-accent]="!isSelectedDay(day.date, viewYear(), viewMonth())"
-                [class.bg-white]="isSelectedDay(day.date, viewYear(), viewMonth())">
-              </span>
-            }
-          </div>
-        }
-      </div>
-    </div>
-
-    <hr class="border-gray-200">
-    <!-- NEXT MONTH -->
-    <div class="flex flex-col gap-2 opacity-40">
-      <div class="flex items-center justify-between">
-        <span class="text-[10px] font-medium text-gray-900 capitalize">{{ nextMonthLabel() }}</span>
-        <span class="text-[10px] text-secondary-light">€ {{ nextMonthTotal() | number:'1.2-2' }}</span>
-      </div>
-      <div class="grid grid-cols-7 gap-0.5">
-        @for (day of ['M','T','W','T','F','S','S']; track $index) {
-          <span class="text-center text-[8px] text-secondary-light py-0.5">{{ day }}</span>
-        }
-        @for (empty of nextMonthEmptyCells(); track $index) {
-          <span></span>
-        }
-        @for (day of nextMonthCalendarDays(); track day.date) {
-          <div class="w-[20px] h-[20px] mx-auto rounded flex items-center justify-center text-[9px] relative cursor-pointer text-secondary"
-            [class.bg-primary]="isSelectedDay(day.date, nextMonthData().year, nextMonthData().month)"
-            [class.text-white]="isSelectedDay(day.date, nextMonthData().year, nextMonthData().month)"
-            (click)="onDayClick(day.date, nextMonthData().year, nextMonthData().month)">
-            {{ day.date }}
-            @if (day.hasExpense) {
-              <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent"></span>
-            }
-          </div>
-        }
-      </div>
-    </div>
-  </aside>
+  <app-calendar
+    [expensesList]="expensesList()"
+    (dateSelected)="selectedDate.set($event)">
+  </app-calendar>
 </div>
