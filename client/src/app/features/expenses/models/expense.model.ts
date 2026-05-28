@@ -6,7 +6,8 @@ export interface ExpenseRead
     date: Date, //DateOnly
     createdAt: Date,
     categoryId: string,
-    categoryName: string
+    categoryName: string,
+    categoryColor: string
 }
 
 export interface ExpenseCreate 
