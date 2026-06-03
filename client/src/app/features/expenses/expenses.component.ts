@@ -16,7 +16,6 @@ import { CalendarComponent } from '@layout/calendar/calendar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpensesComponent implements OnInit {
-
   //============================================================
   // INJECT
   //============================================================
@@ -29,7 +28,6 @@ export class ExpensesComponent implements OnInit {
   protected readonly today = new Date();
   protected readonly currentMonth = this.today.getMonth() + 1;
   protected readonly currentYear = this.today.getFullYear();
-  protected readonly currentMonthLabel = this.today.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
   //============================================================
   // SIGNALS
@@ -39,26 +37,44 @@ export class ExpensesComponent implements OnInit {
   protected selectedCategoryId = signal<string | null>(null);
   protected selectedDate = signal<string>(getTodayString());
 
+  //Variables to manage the expenses monthly info
+  protected viewYear = signal(this.currentYear);
+  protected viewMonth = signal(this.currentMonth);
+
   //============================================================
   // COMPUTED
   //============================================================
+  protected currentMonthLabel = computed(() =>
+    new Date(this.viewYear(), this.viewMonth() - 1, 1)
+      .toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
+  );
+
   protected filteredExpenses = computed(() => {
     const date = this.selectedDate();
     const categoryId = this.selectedCategoryId();
+
     return this.expensesList().filter(e => {
       const expenseDate = e.date.toString().split('T')[0];
       const datesMatch = expenseDate === date;
       const categoryMatches = !categoryId || e.categoryId === categoryId;
+
       return datesMatch && categoryMatches;
     });
   });
 
   protected grandTotal = computed(() =>
-    this.expensesList().reduce((sum, e) => sum + e.amount, 0)
+    this.expensesList()
+    .filter(e => {
+      const [y, m] = e.date.toString().split('-').map(Number);
+
+      return y === this.viewYear() && m === this.viewMonth();
+    })
+    .reduce((sum, e) => sum + e.amount, 0)
   );
 
   protected dailyAverage = computed(() => {
-    const daysInMonth = getDaysInMonth(this.currentYear, this.currentMonth);
+    const daysInMonth = getDaysInMonth(this.viewYear(), this.viewMonth());
+
     return this.grandTotal() / daysInMonth;
   });
 
@@ -83,5 +99,10 @@ export class ExpensesComponent implements OnInit {
         this.isSkeletonLoading.set(false);
       }
     });
+  }
+
+  protected onMonthChanged(event: { year: number; month: number }) {
+    this.viewYear.set(event.year);
+    this.viewMonth.set(event.month);
   }
 }

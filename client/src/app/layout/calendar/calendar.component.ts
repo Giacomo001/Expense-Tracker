@@ -26,7 +26,8 @@ export class CalendarComponent {
   // INJECT
   // ============================================================
   expensesList = input<ExpenseRead[]>([]);
-  dateSelected = output<string>();
+  dateSelected = output<string>(); //Emits the selected date to the parent
+  monthSelected = output<{ year: number, month: number }>(); //Emits the specific month
   
   // ============================================================
   // SIGNALS
@@ -90,10 +91,12 @@ export class CalendarComponent {
     const date = toDateString(year, month, day);
     this.selectedDate.set(date);
     this.dateSelected.emit(date);
+
     //Navigate calendar to clicked month if different from current view
     if (year !== this.viewYear() || month !== this.viewMonth()) {
       this.viewYear.set(year);
       this.viewMonth.set(month);
+      this.monthSelected.emit({ year, month });
     }
   }
 
@@ -105,11 +108,13 @@ export class CalendarComponent {
     const prev = getPreviousMonth(this.viewYear(), this.viewMonth());
     this.viewYear.set(prev.year);
     this.viewMonth.set(prev.month);
+    this.monthSelected.emit({ year: prev.year, month: prev.month });
   }
 
   protected goToNextMonth() {
     const next = getNextMonth(this.viewYear(), this.viewMonth());
     this.viewYear.set(next.year);
     this.viewMonth.set(next.month);
+    this.monthSelected.emit({ year: next.year, month: next.month });
   }
 }
