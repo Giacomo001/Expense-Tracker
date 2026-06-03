@@ -6,6 +6,8 @@ import { ToastService } from '@core/services/toast/toast.service';
 import { CategoryRead } from '../models/category.model';
 import { ExpenseRead } from '@features/expenses/models/expense.model';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { CategoryDialogComponent } from '@shared/components/category-dialog/category-dialog.component';
 
 @Component({
   selector: 'app-categories',
@@ -20,6 +22,7 @@ export class CategoriesComponent implements OnInit {
   // ============================================================
   private categoriesService = inject(CategoriesService);
   private toastService = inject(ToastService);
+  private dialog = inject(MatDialog);
 
   // ============================================================
   // INPUTS & OUTPUTS
@@ -61,5 +64,42 @@ export class CategoriesComponent implements OnInit {
   protected selectCategory(id: string | null) {
     this.selectedCategoryId.set(id);
     this.categorySelected.emit(id);
+  }
+
+  //Dialog Methods
+  protected openCreateDialog() {
+    const ref = this.dialog.open(CategoryDialogComponent, {
+      width: '400px',
+      data: null //It is the CREATE method
+    });
+
+    ref.afterClosed().subscribe(result => {
+      //Update the page with the new category created
+      if(result) this.categoriesList.update(list => [...list, result]);
+    });
+  }
+
+  protected openEditDialog(category: CategoryRead) {
+    const ref = this.dialog.open(CategoryDialogComponent, {
+      width: '400px',
+      data: category //Populated == edit mode
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if(result) this.categoriesList.update(list => list.map(c => c.id === result.id ? result : c));
+    });
+  }
+
+  deleteCategory(categoryId: string) {
+    this.toastService.loading(
+      this.categoriesService.deleteCategory(categoryId),
+      {
+        loading: "Deleting category...",
+        success: "Category deleted!",
+        error: err => err?.error?.title ?? 'An error occurred'
+      }
+    ).subscribe({
+      next: () => this.categoriesList.update(list => list.filter(c => categoryId != c.id))
+    });
   }
 }

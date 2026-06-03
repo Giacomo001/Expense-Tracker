@@ -1,4 +1,4 @@
-  <aside class="bg-white h-full border-r border-gray-200 flex flex-col gap-1 p-3 overflow-y-auto">
+  <aside class="bg-white h-full border-r border-gray-200 flex flex-col gap-1 p-2 overflow-y-auto">
     <span class="text-xs text-secondary-light uppercase tracking-widest px-2 mb-2">Categories</span>
     <div (click)="selectedCategoryId.set(null)"
       class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all"
@@ -16,7 +16,7 @@
 
     @for (category of categoriesList(); track category.id) {
       <div (click)="selectedCategoryId.set(category.id)"
-        class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all"
+        class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all group"
         [class.bg-info-light]="selectedCategoryId() === category.id"
         [class.border-primary-light]="selectedCategoryId() === category.id"
         [class.text-primary-dark]="selectedCategoryId() === category.id"
@@ -27,10 +27,25 @@
         <span class="w-2 h-2 rounded-full flex-shrink-0" [style.background-color]="category.color"></span>
         {{ category.name }}
         <span class="ml-auto text-xs">€ {{ expensesList() | sum:category.id | number:'1.2-2' }}</span>
+
+        <div class="hidden group-hover:flex items-center gap-1 ml-1 flex-shrink-0">
+          <button type="button"
+            (click)="openEditDialog(category); $event.stopPropagation()"
+            class="w-5 h-5 flex items-center justify-center rounded hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
+            <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">edit</mat-icon>
+          </button>
+          <button type="button"
+            (click)="deleteCategory(category.id); $event.stopPropagation()"
+            class="w-5 h-5 flex items-center justify-center rounded hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
+            <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
+          </button>
+        </div>
       </div>
     }
 
-    <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-secondary-light border border-dashed border-gray-200 mt-2 cursor-pointer">
+    <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-secondary-light 
+      border border-dashed border-gray-200 mt-2 cursor-pointer"
+      (click)="openCreateDialog()">
       <mat-icon class="text-base">add</mat-icon>
       Add category
     </div>
