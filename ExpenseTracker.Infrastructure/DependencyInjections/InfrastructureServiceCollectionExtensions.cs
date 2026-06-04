@@ -28,7 +28,7 @@ public static class InfrastructureServiceCollectionExtensions
             opt.Password.RequireLowercase = true;
             opt.Password.RequiredUniqueChars = 6;
 
-            //Lockout
+            //Lockout after 5 tries
             opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             opt.Lockout.MaxFailedAccessAttempts = 5;
             opt.Lockout.AllowedForNewUsers = true;
@@ -38,7 +38,8 @@ public static class InfrastructureServiceCollectionExtensions
         })
         .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddSignInManager();
 
         //UnitOfWork
         services.AddScoped<IUnitOfWork, UnitOfWork>();

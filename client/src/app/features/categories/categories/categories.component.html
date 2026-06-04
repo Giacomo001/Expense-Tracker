@@ -35,7 +35,7 @@
             <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">edit</mat-icon>
           </button>
           <button type="button"
-            (click)="deleteCategory(category.id); $event.stopPropagation()"
+            (click)="deleteCategory(category.id, category.name, title ); $event.stopPropagation()"
             class="w-5 h-5 flex items-center justify-center rounded hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
             <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
           </button>
