@@ -14,6 +14,13 @@ public class DeleteCategoryHandler(IUnitOfWork uow) : IRequestHandler<DeleteCate
         var categoryDb = await uow.Categories.GetCategoryByIdAsync(request.CategoryId, request.UserId, token);
         if(categoryDb is null) return Error.NotFound("Category.NotFound", "The category was not found.");
 
+        //Checks if there are expenses associated with this category before deleting
+        var expenses = await uow.Expenses.GetAllExpensesByUserIdAsync(request.UserId, token);
+        if (expenses.Any(e => e.CategoryId == request.CategoryId))
+        {
+            return Error.Conflict("Category.Delete", "Cannot delete a category that has associated expenses.");            
+        }
+
         uow.Categories.DeleteCategory(categoryDb);
         if(!await uow.Complete(token)) return Error.Failure("Category.Failure", "There was a problem and the category could not be deleted.");
 

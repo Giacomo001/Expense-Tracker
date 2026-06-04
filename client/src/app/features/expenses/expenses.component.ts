@@ -62,14 +62,16 @@ export class ExpensesComponent implements OnInit {
     });
   });
 
-  protected grandTotal = computed(() =>
-    this.expensesList()
-    .filter(e => {
-      const [y, m] = e.date.toString().split('-').map(Number);
+  protected monthExpenses = computed(() => {
+    return this.expensesList().filter(e => {
+        const [y, m] = e.date.toString().split('-').map(Number);
 
-      return y === this.viewYear() && m === this.viewMonth();
-    })
-    .reduce((sum, e) => sum + e.amount, 0)
+        return y === this.viewYear() && m === this.viewMonth();
+      })
+  });
+
+  protected grandTotal = computed(() =>
+    this.monthExpenses().reduce((sum, e) => sum + e.amount, 0)
   );
 
   protected dailyAverage = computed(() => {

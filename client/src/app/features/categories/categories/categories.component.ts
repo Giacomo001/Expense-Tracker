@@ -8,6 +8,7 @@ import { ExpenseRead } from '@features/expenses/models/expense.model';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { CategoryDialogComponent } from '@shared/components/category-dialog/category-dialog.component';
+import { ConfirmDialogData, DeleteDialogComponent } from '@shared/components/delete-dialog/delete-dialog.component';
 
 @Component({
   selector: 'app-categories',
@@ -36,6 +37,11 @@ export class CategoriesComponent implements OnInit {
   protected categoriesList = signal<CategoryRead[]>([]);
   protected selectedCategoryId = signal<string | null>(null);
   protected isLoading = signal<boolean>(true);
+
+  // ============================================================
+  // PROPERTIES
+  // ============================================================
+  protected title = "category";
   
   // ============================================================
   // LIFE CYCLES
@@ -90,16 +96,25 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  deleteCategory(categoryId: string) {
-    this.toastService.loading(
-      this.categoriesService.deleteCategory(categoryId),
-      {
-        loading: "Deleting category...",
-        success: "Category deleted!",
-        error: err => err?.error?.title ?? 'An error occurred'
-      }
-    ).subscribe({
-      next: () => this.categoriesList.update(list => list.filter(c => categoryId != c.id))
+  deleteCategory(categoryId: string, name: string, title: string) {
+    //It gets the delete dialog answer
+    const ref = this.dialog.open(DeleteDialogComponent, {
+      data: { itemName: name, title: title } satisfies ConfirmDialogData //It verifies that the type is the correct one
+    });
+
+    ref.afterClosed().subscribe(confirmed => {
+      if(!confirmed) return;
+
+      this.toastService.loading(
+        this.categoriesService.deleteCategory(categoryId),
+        {
+          loading: "Deleting category...",
+          success: "Category deleted!",
+          error: err => err?.error?.title ?? 'An error occurred'
+        }
+      ).subscribe({
+        next: () => this.categoriesList.update(list => list.filter(c => categoryId != c.id))
+      });
     });
   }
 }

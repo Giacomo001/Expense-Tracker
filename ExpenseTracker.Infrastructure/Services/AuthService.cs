@@ -16,6 +16,7 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class AuthService(
     UserManager<User> userManager,
+    SignInManager<User> signInManager,
     IJwtService jwtService,
     IUnitOfWork uow,
     IConfiguration config,
@@ -67,8 +68,15 @@ public class AuthService(
         var user = await userManager.FindByEmailAsync(login.Email);
         if(user is null) return Error.Unauthorized("Auth.Login", "Invalid credentials.");
 
-        var passwordValid = await userManager.CheckPasswordAsync(user, login.Password);
-        if(!passwordValid) return Error.Unauthorized("Auth.Login", "Invalid credentials.");
+        //CheckLockedOut before attempting login
+        if(await userManager.IsLockedOutAsync(user)) return Error.Forbidden("Auth.Login", "Account is temporarily locked. Please try again later.");
+
+        //PasswordSignInAsync handles the lockout automatically after X login attempts by checking the password
+        var result = await signInManager.CheckPasswordSignInAsync(user, login.Password, lockoutOnFailure: true);
+
+        if (result.IsLockedOut) return Error.Forbidden("Auth.Login", "Account is temporarily locked. Please try again later.");
+
+        if (!result.Succeeded) return Error.Unauthorized("Auth.Login", "Invalid credentials.");
 
         return await GenerateAuthResponseAsync(user, token);
     }
