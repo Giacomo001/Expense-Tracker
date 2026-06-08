@@ -55,7 +55,7 @@
       @for (empty of data.emptyCells; track $index) {
         <span></span>
       }
-      @for (day of data.calendarDays; track day.date) {
+      @for (day of data.calendarDays; track day.date + '-' + day.hasExpense) {
         <div class="mx-auto rounded flex items-center justify-center relative cursor-pointer text-secondary"
           [class.w-[22px]]="!compact"
           [class.h-[22px]]="!compact"

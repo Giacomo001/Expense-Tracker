@@ -1,0 +1,17 @@
+<div class="grid grid-cols-[13.75rem_1fr_13.75rem] h-screen overflow-hidden">
+    <!-- SIDEBAR — CATEGORIES -->
+    <app-categories
+        [expensesList]="expensesList()"
+        (categorySelected)="selectedCategoryId.set($event)">
+    </app-categories>
+
+    <div class="h-full overflow-hidden">
+        <router-outlet />
+    </div>
+
+    <!-- SIDEBAR — CALENDAR -->
+    <app-calendar
+        (dateSelected)="onDateSelected($event)"
+        (monthSelected)="onMonthChanged($event)">
+    </app-calendar>
+</div>
