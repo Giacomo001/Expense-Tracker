@@ -22,12 +22,15 @@ public class CreateExpenseHandler(IUnitOfWork uow,
             return validationResult.Errors
                 .Select(e => Error.Validation(e.ErrorCode, e.ErrorMessage))
                 .ToList();
-        }
+        };
 
         var expense = request.Dto.ExpenseCreateToEntity(request.UserId);
         await uow.Expenses.CreateExpenseAsync(expense, token);
-
         if(!await uow.Complete(token)) return Error.Failure("Expense.Create", "An error occurred during the creation of the expense.");
+
+        //Reload from DB to get the Category navigation property populated
+        var expenseWithCategory = await uow.Expenses.GetExpenseByIdAsync(expense.Id, request.UserId, token);
+        if (expenseWithCategory is null) return Error.Failure("Expense.Create", "An error occurred retrieving the created expense.");
 
         return expense.ExpenseToReadDto();
     }

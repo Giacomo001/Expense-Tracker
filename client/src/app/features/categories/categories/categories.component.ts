@@ -1,6 +1,4 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, output, signal } from '@angular/core';
-import { SumPipe } from '@shared/pipes/sum.pipe';
 import { CategoriesService } from '../services/categories.service';
 import { ToastService } from '@core/services/toast/toast.service';
 import { CategoryRead } from '../models/category.model';
@@ -9,10 +7,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { CategoryDialogComponent } from '@shared/components/category-dialog/category-dialog.component';
 import { ConfirmDialogData, DeleteDialogComponent } from '@shared/components/delete-dialog/delete-dialog.component';
+import { AppStateService } from '@core/services/state/app-state.service';
 
 @Component({
   selector: 'app-categories',
-  imports: [MatIconModule, DecimalPipe, SumPipe],
+  imports: [MatIconModule],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +21,7 @@ export class CategoriesComponent implements OnInit {
   // INJECT
   // ============================================================
   private categoriesService = inject(CategoriesService);
+  private appStateService = inject(AppStateService);
   private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
@@ -57,6 +57,7 @@ export class CategoriesComponent implements OnInit {
     this.categoriesService.getCategories().subscribe({
       next: (categories) => {
         this.categoriesList.set(categories);
+        this.appStateService.categoriesList.set(categories); //It syncs the categories for the ENTIRE app
         this.isLoading.set(false);
       },
       error: () => {
@@ -81,7 +82,10 @@ export class CategoriesComponent implements OnInit {
 
     ref.afterClosed().subscribe(result => {
       //Update the page with the new category created
-      if(result) this.categoriesList.update(list => [...list, result]);
+      if(result) {
+        this.categoriesList.update(list => [...list, result]);
+        this.appStateService.categoriesList.set(this.categoriesList()); //Syncs the list
+      }      
     });
   }
 
@@ -92,11 +96,14 @@ export class CategoriesComponent implements OnInit {
     });
 
     ref.afterClosed().subscribe(result => {
-      if(result) this.categoriesList.update(list => list.map(c => c.id === result.id ? result : c));
+      if(result) {
+        this.categoriesList.update(list => list.map(c => c.id === result.id ? result : c));
+        this.appStateService.categoriesList.set(this.categoriesList());
+      }
     });
   }
 
-  deleteCategory(categoryId: string, name: string, title: string) {
+  protected deleteCategory(categoryId: string, name: string, title: string) {
     //It gets the delete dialog answer
     const ref = this.dialog.open(DeleteDialogComponent, {
       data: { itemName: name, title: title } satisfies ConfirmDialogData //It verifies that the type is the correct one
@@ -113,7 +120,10 @@ export class CategoriesComponent implements OnInit {
           error: err => err?.error?.title ?? 'An error occurred'
         }
       ).subscribe({
-        next: () => this.categoriesList.update(list => list.filter(c => categoryId != c.id))
+        next: () => {
+          this.categoriesList.update(list => list.filter(c => categoryId != c.id));
+          this.appStateService.categoriesList.set(this.categoriesList());
+        }
       });
     });
   }
