@@ -1,19 +1,30 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { guestGuard } from '@core/guards/guest.guard';
+import { LayoutBaseComponent } from '@layout/layout-base/layout-base.component';
 
 export const routes: Routes = [
   {
     path: '',
+    component: LayoutBaseComponent,
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('@features/expenses/expenses.component').then(m => m.ExpensesComponent)
-  },
-  {
-    path: 'reports',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('@features/reports/reports.component').then(m => m.ReportsComponent)
+    children: [
+      {
+        path: 'expenses',
+        loadComponent: () =>
+          import('@features/expenses/expenses.component').then(m => m.ExpensesComponent)
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('@features/reports/reports.component').then(m => m.ReportsComponent)
+      },
+      { 
+        path: '', 
+        redirectTo: 'expenses', 
+        pathMatch: 'full' 
+      }
+    ]
   },
   {
     path: 'auth',

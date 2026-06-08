@@ -1,6 +1,7 @@
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { AppStateService } from '@core/services/state/app-state.service';
 import { ExpenseRead } from '@features/expenses/models/expense.model';
 import { buildCalendarDays, getFirstDayOfMonth, getMonthLabel, getNextMonth, getPreviousMonth, getTodayString, getTwoMonthsAhead, toDateString } from '@shared/utils/calendar.utils';
 
@@ -22,23 +23,28 @@ interface MonthData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarComponent {
-  // ============================================================
+  //============================================================
   // INJECT
-  // ============================================================
-  expensesList = input<ExpenseRead[]>([]);
+  //============================================================
+  private appStateService = inject(AppStateService);
+
+  //============================================================
+  // INPUTS / OUTPUTS
+  //============================================================
   dateSelected = output<string>(); //Emits the selected date to the parent
   monthSelected = output<{ year: number, month: number }>(); //Emits the specific month
   
-  // ============================================================
+  //============================================================
   // SIGNALS
-  // ============================================================
-  protected selectedDate = signal<string>(getTodayString());
-  protected viewYear = signal(new Date().getFullYear());
-  protected viewMonth = signal(new Date().getMonth() + 1);
+  //============================================================
+  protected expensesList = this.appStateService.expensesList;
+  protected selectedDate = this.appStateService.selectedDate;
+  protected viewYear = this.appStateService.viewYear;
+  protected viewMonth = this.appStateService.viewMonth;
 
-  // ============================================================
+  //============================================================
   // COMPUTED
-  // ============================================================
+  //============================================================
   protected viewMonthLabel = computed(() =>
     getMonthLabel(this.viewYear(), this.viewMonth())
   );
@@ -84,9 +90,9 @@ export class CalendarComponent {
     return this.buildMonthData(nextTwo.year, nextTwo.month);
   });
 
-  // ============================================================
+  //============================================================
   // METHODS
-  // ============================================================
+  //============================================================
   protected onDayClick(day: number, year: number, month: number) {
     const date = toDateString(year, month, day);
     this.selectedDate.set(date);

@@ -1,25 +1,24 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { ExpensesService } from './services/expenses.service';
 import { ExpenseRead } from './models/expense.model';
 import { ToastService } from '@core/services/toast/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { DatePipe, DecimalPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
-import { getDaysInMonth, getTodayString } from '@shared/utils/calendar.utils';
-import { CategoriesComponent } from '@features/categories/categories/categories.component';
-import { CalendarComponent } from '@layout/calendar/calendar.component';
+import { getDaysInMonth } from '@shared/utils/calendar.utils';
 import { MatDialog } from '@angular/material/dialog';
 import { ExpenseDialogComponent, ExpenseDialogData } from '@shared/components/expense-dialog/expense-dialog.component';
 import { ConfirmDialogData, DeleteDialogComponent } from '@shared/components/delete-dialog/delete-dialog.component';
 import { AppStateService } from '@core/services/state/app-state.service';
+import { RouterLink, RouterLinkActive } from "@angular/router";
 
 @Component({
   selector: 'app-expenses',
-  imports: [MatIconModule, DatePipe, DecimalPipe, CategoriesComponent, CalendarComponent, NgTemplateOutlet, KeyValuePipe],
+  imports: [MatIconModule, DatePipe, DecimalPipe, NgTemplateOutlet, KeyValuePipe, RouterLink, RouterLinkActive],
   templateUrl: './expenses.component.html',
   styleUrl: './expenses.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ExpensesComponent implements OnInit {
+export class ExpensesComponent {
   //============================================================
   // INJECT
   //============================================================
@@ -29,27 +28,21 @@ export class ExpensesComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   //============================================================
-  // PROPERTIES
-  //============================================================
-  protected readonly today = new Date();
-  protected readonly currentMonth = this.today.getMonth() + 1;
-  protected readonly currentYear = this.today.getFullYear();
-
-  //============================================================
   // SIGNALS
   //============================================================
-  protected expensesList = signal<ExpenseRead[]>([]);
-  protected isSkeletonLoading = signal<boolean>(true);
-  protected selectedCategoryId = signal<string | null>(null);
-  protected selectedDate = signal<string>(getTodayString());
+  protected expensesList = this.appStateService.expensesList;
+  protected selectedCategoryId = this.appStateService.selectedCategoryId;
+  protected selectedDate = this.appStateService.selectedDate;
 
   //Variables to manage the expenses monthly info
-  protected viewYear = signal(this.currentYear);
-  protected viewMonth = signal(this.currentMonth);
+  protected viewYear = this.appStateService.viewYear;
+  protected viewMonth = this.appStateService.viewMonth;
 
-  //============================================================
+  // ============================================================
   // COMPUTED
-  //============================================================
+  // ============================================================
+  protected isSkeletonLoading = computed(() => this.expensesList().length === 0);
+
   protected currentMonthLabel = computed(() =>
     new Date(this.viewYear(), this.viewMonth() - 1, 1)
       .toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
@@ -118,36 +111,10 @@ export class ExpensesComponent implements OnInit {
   //============================================================
   // LIFE CYCLES
   //============================================================
-  ngOnInit(): void {
-    this.loadRecords();
-  }
 
   //============================================================
   // METHODS
   //============================================================
-  private loadRecords() {
-    this.expenseService.getExpenses().subscribe({
-      next: (expenses) => {
-        this.expensesList.set(expenses);
-        this.appStateService.expensesList.set(expenses);
-        this.isSkeletonLoading.set(false);
-      },
-      error: () => {
-        this.toastService.error("There was an error loading the records.");
-        this.isSkeletonLoading.set(false);
-      }
-    });
-  }
-
-  protected onMonthChanged(event: { year: number; month: number }) {
-    this.viewYear.set(event.year);
-    this.viewMonth.set(event.month);
-  }
-
-  protected onDateSelected(date: string) {
-    this.selectedDate.set(date);
-    this.selectedCategoryId.set(null); //Resets category filter when a date is selected
-  }
 
   //DIALOG
   protected openCreateDialog() {
@@ -162,7 +129,6 @@ export class ExpensesComponent implements OnInit {
     ref.afterClosed().subscribe(result => {
       if(result) {
         this.expensesList.update(list => [...list, result]);
-        this.appStateService.expensesList.set(this.expensesList());
       }
     });
   }
@@ -182,8 +148,6 @@ export class ExpensesComponent implements OnInit {
           //Updates only the one with the same Id as the one passed as a parameter
           list.map(e => e.id === result.id ? result : e)
         );
-
-        this.appStateService.expensesList.set(this.expensesList());
       }
     });
   }
@@ -206,7 +170,6 @@ export class ExpensesComponent implements OnInit {
       ).subscribe({
         next: () => {
           this.expensesList.update(list => list.filter(c => expenseId != c.id));
-          this.appStateService.expensesList.set(this.expensesList());
         }
       });
     });
