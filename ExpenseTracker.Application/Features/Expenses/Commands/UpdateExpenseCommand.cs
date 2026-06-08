@@ -23,7 +23,7 @@ public class UpdateExpenseHandler(IUnitOfWork uow,
             return validationResult.Errors
                 .Select(e => Error.Validation(e.ErrorCode, e.ErrorMessage))
                 .ToList();
-        }
+        };
 
         //Db record recovery
         var expenseDb = await uow.Expenses.GetExpenseByIdAsync(request.ExpenseId, request.UserId, token);

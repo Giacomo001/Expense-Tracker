@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ToastService } from '@core/services/toast/toast.service';
 import { CategoriesService } from '@features/categories/services/categories.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog'
-import { CategoryRead } from '@features/categories/models/category.model';
+import { CategoryCreate, CategoryRead, CategoryUpdate } from '@features/categories/models/category.model';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -64,8 +64,8 @@ export class CategoryDialogComponent implements OnInit {
 
     //If it is in 'edit mode', the Update is called otherwise the Create is
     const request$ = this.isEditMode ?
-      this.categoriesService.updateCategory(this.data!.id, this.categoryForm.value) :
-      this.categoriesService.createCategory(this.categoryForm.value);
+      this.categoriesService.updateCategory(this.data!.id, this.categoryForm.value as CategoryUpdate) :
+      this.categoriesService.createCategory(this.categoryForm.value as CategoryCreate);
 
     this.toastService.loading(request$, {
       loading: this.loadingMessage,
