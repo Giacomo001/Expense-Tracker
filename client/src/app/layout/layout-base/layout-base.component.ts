@@ -6,6 +6,9 @@ import { AppStateService } from '@core/services/state/app-state.service';
 import { RouterOutlet } from '@angular/router';
 import { ExpensesService } from '@features/expenses/services/expenses.service';
 import { ToastService } from '@core/services/toast/toast.service';
+import { CategoryRead } from '@features/categories/models/category.model';
+import { CategoriesService } from '@features/categories/services/categories.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-layout-base',
@@ -20,6 +23,7 @@ export class LayoutBaseComponent implements OnInit {
   //============================================================
   private appStateService = inject(AppStateService);
   private expenseService = inject(ExpensesService);
+  private categoryService = inject(CategoriesService);
   private toastService = inject(ToastService);
 
   //============================================================
@@ -31,6 +35,7 @@ export class LayoutBaseComponent implements OnInit {
   // SIGNALS
   //============================================================
   protected expensesList = signal<ExpenseRead[]>([]);
+  protected categoriesList = signal<CategoryRead[]>([]);
 
   //============================================================
   // COMPUTED
@@ -47,11 +52,17 @@ export class LayoutBaseComponent implements OnInit {
   // METHODS
   //============================================================
   private loadRecords() {
-    this.expenseService.getExpenses().subscribe({
-      next: (expenses) => {
+    const request$ = forkJoin({
+      expenses: this.expenseService.getExpenses(),
+      categories: this.categoryService.getCategories()
+    });
+
+    request$.subscribe({
+      next: ({ expenses, categories }) => {
         this.appStateService.expensesList.set(expenses);
+        this.appStateService.categoriesList.set(categories);
       },
-      error: () => {
+      error: _ => {
         this.toastService.error("There was an error loading the records.");
       }
     });

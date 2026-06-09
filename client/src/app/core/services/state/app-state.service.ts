@@ -16,6 +16,7 @@ export class AppStateService {
   protected readonly currentMonth = this.today.getMonth() + 1;
   protected readonly currentYear = this.today.getFullYear();
 
+  //Selection Management
   readonly viewYear = signal<number>(this.currentYear);
   readonly viewMonth = signal<number>(this.currentMonth);
   readonly selectedDate = signal<string>(getTodayString());
