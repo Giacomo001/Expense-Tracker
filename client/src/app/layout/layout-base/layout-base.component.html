@@ -1,7 +1,6 @@
 <div class="grid grid-cols-[13.75rem_1fr_13.75rem] h-screen overflow-hidden">
     <!-- SIDEBAR — CATEGORIES -->
     <app-categories
-        [expensesList]="expensesList()"
         (categorySelected)="selectedCategoryId.set($event)">
     </app-categories>
 

@@ -66,6 +66,10 @@
           [class.bg-primary]="isSelectedDay(day.date, data.year, data.month)"
           [class.text-white]="isSelectedDay(day.date, data.year, data.month)"
           [class.font-medium]="isSelectedDay(day.date, data.year, data.month) && !compact"
+          [class.border]="day.isToday"
+          [class.rounded-sm]="day.isToday"
+          [class.border-primary]="day.isToday && !isSelectedDay(day.date, data.year, data.month)"
+          [class.font-bold]="day.isToday"
           (click)="onDayClick(day.date, data.year, data.month)">
           {{ day.date }}
           @if (day.hasExpense) {

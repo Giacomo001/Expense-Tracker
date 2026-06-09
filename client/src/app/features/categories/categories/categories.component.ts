@@ -16,7 +16,7 @@ import { AppStateService } from '@core/services/state/app-state.service';
   styleUrl: './categories.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CategoriesComponent implements OnInit {
+export class CategoriesComponent {
   // ============================================================
   // INJECT
   // ============================================================
@@ -28,14 +28,14 @@ export class CategoriesComponent implements OnInit {
   // ============================================================
   // INPUTS & OUTPUTS
   // ============================================================
-  expensesList = input<ExpenseRead[]>([]);
+  expensesList = this.appStateService.expensesList;
   categorySelected = output<string | null>(); //Emits to parent
   
   // ============================================================
   // SIGNALS
   // ============================================================
-  protected categoriesList = signal<CategoryRead[]>([]);
-  protected selectedCategoryId = signal<string | null>(null);
+  protected categoriesList = this.appStateService.categoriesList;
+  protected selectedCategoryId = this.appStateService.selectedCategoryId;
   protected isLoading = signal<boolean>(true);
 
   // ============================================================
@@ -46,27 +46,10 @@ export class CategoriesComponent implements OnInit {
   // ============================================================
   // LIFE CYCLES
   // ============================================================
-  ngOnInit(): void {
-    this.loadRecords();
-  }
   
   // ============================================================
   // METHODS
   // ============================================================
-  private loadRecords() {
-    this.categoriesService.getCategories().subscribe({
-      next: (categories) => {
-        this.categoriesList.set(categories);
-        this.appStateService.categoriesList.set(categories); //It syncs the categories for the ENTIRE app
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.toastService.error('There was an error loading the categories.');
-        this.isLoading.set(false);
-      }
-    });
-  }
-
   //Method to emit the value of the chosen category
   protected selectCategory(id: string | null) {
     this.selectedCategoryId.set(id);
@@ -84,7 +67,6 @@ export class CategoriesComponent implements OnInit {
       //Update the page with the new category created
       if(result) {
         this.categoriesList.update(list => [...list, result]);
-        this.appStateService.categoriesList.set(this.categoriesList()); //Syncs the list
       }      
     });
   }
@@ -98,7 +80,6 @@ export class CategoriesComponent implements OnInit {
     ref.afterClosed().subscribe(result => {
       if(result) {
         this.categoriesList.update(list => list.map(c => c.id === result.id ? result : c));
-        this.appStateService.categoriesList.set(this.categoriesList());
       }
     });
   }
@@ -122,7 +103,6 @@ export class CategoriesComponent implements OnInit {
       ).subscribe({
         next: () => {
           this.categoriesList.update(list => list.filter(c => categoryId != c.id));
-          this.appStateService.categoriesList.set(this.categoriesList());
         }
       });
     });
