@@ -10,10 +10,11 @@ import { ExpenseDialogComponent, ExpenseDialogData } from '@shared/components/ex
 import { ConfirmDialogData, DeleteDialogComponent } from '@shared/components/delete-dialog/delete-dialog.component';
 import { AppStateService } from '@core/services/state/app-state.service';
 import { RouterLink, RouterLinkActive } from "@angular/router";
+import { TabsComponent } from "@layout/tabs/tabs.component";
 
 @Component({
   selector: 'app-expenses',
-  imports: [MatIconModule, DatePipe, DecimalPipe, NgTemplateOutlet, KeyValuePipe, RouterLink, RouterLinkActive],
+  imports: [MatIconModule, DatePipe, DecimalPipe, NgTemplateOutlet, KeyValuePipe, TabsComponent],
   templateUrl: './expenses.component.html',
   styleUrl: './expenses.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,11 +43,6 @@ export class ExpensesComponent {
   // COMPUTED
   // ============================================================
   protected isSkeletonLoading = computed(() => this.expensesList().length === 0);
-
-  protected currentMonthLabel = computed(() =>
-    new Date(this.viewYear(), this.viewMonth() - 1, 1)
-      .toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
-  );
 
   protected filteredExpenses = computed(() => {
     const date = this.selectedDate();
@@ -107,6 +103,7 @@ export class ExpensesComponent {
   // PROPERTIES
   // ============================================================
   protected title = "expense";
+  protected currentMonthLabel = this.appStateService.currentMonthLabel;
 
   //============================================================
   // LIFE CYCLES
@@ -168,7 +165,7 @@ export class ExpensesComponent {
           error: err => err?.error?.title ?? 'An error occurred'
         }
       ).subscribe({
-        next: () => {
+        next: _ => {
           this.expensesList.update(list => list.filter(c => expenseId != c.id));
         }
       });

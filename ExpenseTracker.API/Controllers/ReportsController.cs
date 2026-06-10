@@ -1,5 +1,6 @@
 using System;
 using System.Security.Claims;
+using ExpenseTracker.Application.DTOs;
 using ExpenseTracker.Application.Features.Reports.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +20,17 @@ public class ReportsController(IMediator mediator) : BaseApiController
 
         return result.Match(
             summary => Ok(summary),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPost("export")]
+    public async Task<IActionResult> ExportPdf([FromBody] ReportPdfRequestDto dto, CancellationToken token)
+    {
+        var result = await mediator.Send(new GenerateReportPdfQuery(dto, UserId), token);
+
+        return result.Match(
+            pdf => File(pdf, "application/pdf", $"report-{dto.View}-{dto.Year}-{dto.Month}.pdf"),
             errors => Problem(errors)
         );
     }

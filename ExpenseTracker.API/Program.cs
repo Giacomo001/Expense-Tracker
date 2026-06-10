@@ -3,6 +3,7 @@ using ExpenseTracker.API.Middleware;
 using ExpenseTracker.Application.DependencyInjections;
 using ExpenseTracker.Infrastructure.DependencyInjections;
 using Scalar.AspNetCore;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 

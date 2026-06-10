@@ -73,7 +73,8 @@ public class GetExpenseByIdQueryTests
             Date: DateOnly.FromDateTime(DateTime.UtcNow),
             CreatedAt: DateTime.UtcNow.AddDays(-1),
             CategoryId: categoryId,
-            CategoryName: "Category Name Test"
+            CategoryName: "Category Name Test",
+            CategoryColor: "#000000"
         );
 
         uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns(expense);

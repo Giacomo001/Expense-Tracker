@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
-import { CategoriesComponent } from "@features/categories/categories/categories.component";
 import { CalendarComponent } from "@layout/calendar/calendar.component";
 import { ExpenseRead } from '@features/expenses/models/expense.model';
 import { AppStateService } from '@core/services/state/app-state.service';
@@ -9,6 +8,7 @@ import { ToastService } from '@core/services/toast/toast.service';
 import { CategoryRead } from '@features/categories/models/category.model';
 import { CategoriesService } from '@features/categories/services/categories.service';
 import { forkJoin } from 'rxjs';
+import { CategoriesComponent } from '@features/categories/categories.component';
 
 @Component({
   selector: 'app-layout-base',
@@ -59,6 +59,7 @@ export class LayoutBaseComponent implements OnInit {
 
     request$.subscribe({
       next: ({ expenses, categories }) => {
+        //Both lists are populated here, in the parent component
         this.appStateService.expensesList.set(expenses);
         this.appStateService.categoriesList.set(categories);
       },
