@@ -59,17 +59,20 @@
         <div class="mx-auto rounded flex items-center justify-center relative cursor-pointer text-secondary"
           [class.w-[22px]]="!compact"
           [class.h-[22px]]="!compact"
-          [class.text-[10px]]="!compact"
           [class.w-[20px]]="compact"
           [class.h-[20px]]="compact"
+
+          [class.text-[10px]]="!compact"
           [class.text-[9px]]="compact"
           [class.bg-primary]="isSelectedDay(day.date, data.year, data.month)"
           [class.text-white]="isSelectedDay(day.date, data.year, data.month)"
           [class.font-medium]="isSelectedDay(day.date, data.year, data.month) && !compact"
+          [class.font-bold]="day.isToday"
+
           [class.border]="day.isToday"
           [class.rounded-sm]="day.isToday"
           [class.border-primary]="day.isToday && !isSelectedDay(day.date, data.year, data.month)"
-          [class.font-bold]="day.isToday"
+          
           (click)="onDayClick(day.date, data.year, data.month)">
           {{ day.date }}
           @if (day.hasExpense) {

@@ -51,7 +51,8 @@ public static class InfrastructureServiceCollectionExtensions
 
         //Services Injection
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IJwtService, JwtService>();        
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IReportGeneratorService, ReportGeneratorService>();   
 
         return services;
     }

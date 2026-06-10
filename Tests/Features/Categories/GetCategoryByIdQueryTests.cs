@@ -60,7 +60,8 @@ public class GetCategoryByIdQueryTests
         var expected = new CategoryReadDto
         (
             Id: categoryId,
-            Name: "Test"
+            Name: "Test",
+            Color: "#000000"
         );
 
         uow.Categories.GetCategoryByIdAsync(categoryId, userId, token).Returns(category);

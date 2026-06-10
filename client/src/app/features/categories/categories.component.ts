@@ -1,13 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, output, signal } from '@angular/core';
-import { CategoriesService } from '../services/categories.service';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { ToastService } from '@core/services/toast/toast.service';
-import { CategoryRead } from '../models/category.model';
-import { ExpenseRead } from '@features/expenses/models/expense.model';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { CategoryDialogComponent } from '@shared/components/category-dialog/category-dialog.component';
 import { ConfirmDialogData, DeleteDialogComponent } from '@shared/components/delete-dialog/delete-dialog.component';
 import { AppStateService } from '@core/services/state/app-state.service';
+import { CategoriesService } from './services/categories.service';
+import { CategoryRead } from './models/category.model';
 
 @Component({
   selector: 'app-categories',
@@ -17,39 +16,39 @@ import { AppStateService } from '@core/services/state/app-state.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesComponent {
-  // ============================================================
+  //============================================================
   // INJECT
-  // ============================================================
+  //============================================================
   private categoriesService = inject(CategoriesService);
   private appStateService = inject(AppStateService);
   private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
-  // ============================================================
+  //============================================================
   // INPUTS & OUTPUTS
-  // ============================================================
+  //============================================================
   expensesList = this.appStateService.expensesList;
   categorySelected = output<string | null>(); //Emits to parent
   
-  // ============================================================
+  //============================================================
   // SIGNALS
-  // ============================================================
+  //============================================================
   protected categoriesList = this.appStateService.categoriesList;
   protected selectedCategoryId = this.appStateService.selectedCategoryId;
   protected isLoading = signal<boolean>(true);
 
-  // ============================================================
+  //============================================================
   // PROPERTIES
-  // ============================================================
+  //============================================================
   protected title = "category";
   
-  // ============================================================
+  //============================================================
   // LIFE CYCLES
-  // ============================================================
+  //============================================================
   
-  // ============================================================
+  //============================================================
   // METHODS
-  // ============================================================
+  //============================================================
   //Method to emit the value of the chosen category
   protected selectCategory(id: string | null) {
     this.selectedCategoryId.set(id);
@@ -101,7 +100,7 @@ export class CategoriesComponent {
           error: err => err?.error?.title ?? 'An error occurred'
         }
       ).subscribe({
-        next: () => {
+        next: _ => {
           this.categoriesList.update(list => list.filter(c => categoryId != c.id));
         }
       });

@@ -34,7 +34,8 @@
         "[csharp]": {
           "editor.defaultFormatter": "ms-dotnettools.csharp"
         },
-        "dotnetAcquisitionExtension.sharedExistingDotnetInstallation": true
+        "dotnetAcquisitionExtension.sharedExistingDotnetInstallation": true,
+        "dotnet.defaultSolution": "/workspace/ExpenseTracker.sln"
       }
     }
   },
