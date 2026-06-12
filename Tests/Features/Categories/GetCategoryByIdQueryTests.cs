@@ -54,6 +54,7 @@ public class GetCategoryByIdQueryTests
         {
             Id = categoryId,
             Name = "Test",
+            Color = "#000000",
             UserId = userId
         };
 

@@ -96,6 +96,7 @@ public class CreateExpenseCommandTests
         var categoryId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
+
         var expenseCreate = new ExpenseCreateDto
         (
             Amount: 20.99m,
@@ -104,8 +105,27 @@ public class CreateExpenseCommandTests
             CategoryId: categoryId
         );
 
+        var expenseEntity = new Expense
+        {
+            Id = Guid.NewGuid(),
+            Amount = 20.99m,
+            Description = "Description Test",
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
+            UserId = userId,
+            CategoryId = categoryId,
+            Category = new Category
+            {
+                Id = categoryId,
+                Name = "Test",
+                Color = "#000000",
+                UserId = userId
+            }
+        };
+
         createValidator.ValidateAsync(Arg.Any<ExpenseCreateDto>(), Arg.Any<CancellationToken>())
             .Returns(new ValidationResult());
+
+        uow.Expenses.GetExpenseByIdAsync(Arg.Any<Guid>(), userId, token).Returns(expenseEntity);
 
         var command = new CreateExpenseCommand(expenseCreate, userId);
         uow.Complete(token).Returns(true);

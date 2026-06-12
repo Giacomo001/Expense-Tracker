@@ -32,6 +32,6 @@ public class CreateExpenseHandler(IUnitOfWork uow,
         var expenseWithCategory = await uow.Expenses.GetExpenseByIdAsync(expense.Id, request.UserId, token);
         if (expenseWithCategory is null) return Error.Failure("Expense.Create", "An error occurred retrieving the created expense.");
 
-        return expense.ExpenseToReadDto();
+        return expenseWithCategory.ExpenseToReadDto();
     }
 }
