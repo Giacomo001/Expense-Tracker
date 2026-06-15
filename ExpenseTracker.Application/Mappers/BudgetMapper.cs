@@ -21,6 +21,7 @@ public static class BudgetMapper
         {
             Id = Guid.NewGuid(),
             Amount = budget.Amount,
+            UserId = userId,
             CategoryId = budget.CategoryId
         };
     }

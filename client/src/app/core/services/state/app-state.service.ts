@@ -1,4 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
+import { BudgetRead } from '@features/budgets/models/budget.model';
 import { CategoryRead } from '@features/categories/models/category.model';
 import { ExpenseRead } from '@features/expenses/models/expense.model';
 import { getTodayString } from '@shared/utils/calendar.utils';
@@ -13,6 +14,7 @@ export class AppStateService {
   //The lists are synced in their components and they are shared throughout the app (SSoT = Single Source of Truth)
   readonly expensesList = signal<ExpenseRead[]>([]);
   readonly categoriesList = signal<CategoryRead[]>([]);
+  readonly budgetsList = signal<BudgetRead[]>([]);
 
   //Selection Management
   readonly viewYear = signal<number>(new Date().getFullYear());
