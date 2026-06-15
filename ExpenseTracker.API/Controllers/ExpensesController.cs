@@ -1,20 +1,14 @@
-using System;
-using System.Security.Claims;
 using ExpenseTracker.Application.DTOs;
 using ExpenseTracker.Application.Features.Expenses.Commands;
 using ExpenseTracker.Application.Features.Expenses.Queries;
-using ExpenseTracker.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTracker.API.Controllers;
-
 [Authorize]
 public class ExpensesController(IMediator mediator) : BaseApiController
 {
-    private Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
     [HttpGet]
     public async Task<IActionResult> GetAllExpenses(CancellationToken token)
     {
@@ -26,10 +20,10 @@ public class ExpensesController(IMediator mediator) : BaseApiController
         );
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetExpenseById(Guid id, CancellationToken token)
+    [HttpGet("{expenseId:guid}")]
+    public async Task<IActionResult> GetExpenseById(Guid expenseId, CancellationToken token)
     {
-        var result = await mediator.Send(new GetExpenseByIdQuery(id, UserId), token);
+        var result = await mediator.Send(new GetExpenseByIdQuery(expenseId, UserId), token);
 
         return result.Match(
             expense => Ok(expense),
@@ -43,7 +37,8 @@ public class ExpensesController(IMediator mediator) : BaseApiController
         var result = await mediator.Send(new CreateExpenseCommand(dto, UserId), token);
 
         return result.Match(
-            expense => CreatedAtAction(nameof(GetExpenseById), new { id = expense.Id }, expense),
+            //The name of 'expenseId =' MUST BE the same as the parameter passed in the right method, in this case 'GetExpenseById'
+            expense => CreatedAtAction(nameof(GetExpenseById), new { expenseId = expense.Id }, expense),
             errors => Problem(errors)
         );
     }

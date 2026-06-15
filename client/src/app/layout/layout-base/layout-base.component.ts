@@ -9,6 +9,8 @@ import { CategoryRead } from '@features/categories/models/category.model';
 import { CategoriesService } from '@features/categories/services/categories.service';
 import { forkJoin } from 'rxjs';
 import { CategoriesComponent } from '@features/categories/categories.component';
+import { BudgetsService } from '@features/budgets/services/budgets.service';
+import { BudgetRead } from '@features/budgets/models/budget.model';
 
 @Component({
   selector: 'app-layout-base',
@@ -22,8 +24,9 @@ export class LayoutBaseComponent implements OnInit {
   // INJECT
   //============================================================
   private appStateService = inject(AppStateService);
-  private expenseService = inject(ExpensesService);
-  private categoryService = inject(CategoriesService);
+  private expensesService = inject(ExpensesService);
+  private categoriesService = inject(CategoriesService);
+  private budgetsService = inject(BudgetsService);
   private toastService = inject(ToastService);
 
   //============================================================
@@ -34,8 +37,6 @@ export class LayoutBaseComponent implements OnInit {
   //============================================================
   // SIGNALS
   //============================================================
-  protected expensesList = signal<ExpenseRead[]>([]);
-  protected categoriesList = signal<CategoryRead[]>([]);
 
   //============================================================
   // COMPUTED
@@ -53,15 +54,17 @@ export class LayoutBaseComponent implements OnInit {
   //============================================================
   private loadRecords() {
     const request$ = forkJoin({
-      expenses: this.expenseService.getExpenses(),
-      categories: this.categoryService.getCategories()
+      expenses: this.expensesService.getExpenses(),
+      categories: this.categoriesService.getCategories(),
+      budgets: this.budgetsService.getBudgetsByUserId()
     });
 
     request$.subscribe({
-      next: ({ expenses, categories }) => {
-        //Both lists are populated here, in the parent component
+      next: ({ expenses, categories, budgets }) => {
+        //All lists are populated here since it's the parent component
         this.appStateService.expensesList.set(expenses);
         this.appStateService.categoriesList.set(categories);
+        this.appStateService.budgetsList.set(budgets);
       },
       error: _ => {
         this.toastService.error("There was an error loading the records.");

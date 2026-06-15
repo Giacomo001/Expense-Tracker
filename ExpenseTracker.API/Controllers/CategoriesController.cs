@@ -15,9 +15,6 @@ namespace ExpenseTracker.API.Controllers;
 [Authorize]
 public class CategoriesController(IMediator mediator) : BaseApiController
 {
-    //Recovers the UserId from the JWT without the chance of passing it randomly in the methods
-    private Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
     [HttpGet]
     public async Task<IActionResult> GetAllCategories(CancellationToken token)
     {

@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -9,6 +10,10 @@ namespace ExpenseTracker.API.Controllers;
 [ApiController]
 public class BaseApiController : ControllerBase
 {
+    //SSoT for the UserId regarding Controllers
+    //Recovers the UserId from the JWT without the chance of passing it randomly in the methods
+    protected Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
     protected IActionResult Problem(List<Error> errors)
     {
         if (errors.Count == 0) return Problem();

@@ -15,19 +15,19 @@ export class ExpensesService {
     return this.http.get<ExpenseRead[]>(`${this.baseUrl}/expenses`);
   }
 
-  getExpenseById(id: string): Observable<ExpenseRead> {
-    return this.http.get<ExpenseRead>(`${this.baseUrl}/expenses/${id}`);
+  getExpenseById(expenseId: string): Observable<ExpenseRead> {
+    return this.http.get<ExpenseRead>(`${this.baseUrl}/expenses/${expenseId}`);
   }
 
   createExpense(expense: ExpenseCreate): Observable<ExpenseRead> {
     return this.http.post<ExpenseRead>(`${this.baseUrl}/expenses`, expense);
   }
 
-  updateExpense(id: string, expense: ExpenseUpdate): Observable<ExpenseRead> {
-    return this.http.put<ExpenseRead>(`${this.baseUrl}/expenses/${id}`, expense);
+  updateExpense(expenseId: string, expense: ExpenseUpdate): Observable<ExpenseRead> {
+    return this.http.put<ExpenseRead>(`${this.baseUrl}/expenses/${expenseId}`, expense);
   }
 
-  deleteExpense(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/expenses/${id}`);
+  deleteExpense(expenseId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/expenses/${expenseId}`);
   }
 }

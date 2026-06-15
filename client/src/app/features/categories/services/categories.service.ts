@@ -15,19 +15,19 @@ export class CategoriesService {
     return this.http.get<CategoryRead[]>(`${this.baseUrl}/categories`);
   }
 
-  getCategoryById(id: string): Observable<CategoryRead> {
-    return this.http.get<CategoryRead>(`${this.baseUrl}/categories/${id}`);
+  getCategoryById(categoryId: string): Observable<CategoryRead> {
+    return this.http.get<CategoryRead>(`${this.baseUrl}/categories/${categoryId}`);
   }
 
   createCategory(category: CategoryCreate): Observable<CategoryRead> {
     return this.http.post<CategoryRead>(`${this.baseUrl}/categories`, category);
   }
 
-  updateCategory(id: string, category: CategoryUpdate): Observable<CategoryRead> {
-    return this.http.put<CategoryRead>(`${this.baseUrl}/categories/${id}`, category);
+  updateCategory(categoryId: string, category: CategoryUpdate): Observable<CategoryRead> {
+    return this.http.put<CategoryRead>(`${this.baseUrl}/categories/${categoryId}`, category);
   }
 
-  deleteCategory(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/categories/${id}`);
+  deleteCategory(categoryId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/categories/${categoryId}`);
   }
 }
