@@ -69,7 +69,7 @@ public class UpdateBudgetCommandTests
         updateValidator.ValidateAsync(Arg.Any<BudgetUpdateDto>(), Arg.Any<CancellationToken>())
             .Returns(new ValidationResult());
 
-        uow.Budgets.GetBudgetByIdAsync(budgetId, userId, token).Returns((Budget)null!);
+        uow.Budgets.GetBudgetByIdAsync(budgetId, userId, token).Returns((Budget?)null);
         var command = new UpdateBudgetCommand(dto, budgetId, userId);
 
         //Act

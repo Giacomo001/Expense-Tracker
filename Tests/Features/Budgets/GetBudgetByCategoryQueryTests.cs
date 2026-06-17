@@ -26,7 +26,7 @@ public class GetBudgetByCategoryQuery
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
 
-        uow.Budgets.GetBudgetByCategoryIdAsync(categoryId, userId, token).Returns((Budget) null!);
+        uow.Budgets.GetBudgetByCategoryIdAsync(categoryId, userId, token).Returns((Budget?) null);
         var query = new GetBudgetByCategoryIdQuery(categoryId, userId);
 
         //Act

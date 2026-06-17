@@ -70,7 +70,7 @@ public class UpdateCategoryCommandTests
         updateValidator.ValidateAsync(Arg.Any<CategoryUpdateDto>(), Arg.Any<CancellationToken>())
             .Returns(new ValidationResult());
 
-        uow.Categories.GetCategoryByIdAsync(categoryId, userId, token).Returns((Category)null!);
+        uow.Categories.GetCategoryByIdAsync(categoryId, userId, token).Returns((Category?)null);
         var command = new UpdateCategoryCommand(dto, categoryId, userId);
 
         //Act

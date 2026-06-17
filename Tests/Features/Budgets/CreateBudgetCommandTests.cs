@@ -167,7 +167,7 @@ public class CreateBudgetCommandTests
         createValidator.ValidateAsync(Arg.Any<BudgetCreateDto>(), Arg.Any<CancellationToken>())
             .Returns(new ValidationResult());
 
-        uow.Budgets.GetBudgetByCategoryIdAsync(categoryId, userId, token).Returns((Budget)null!);
+        uow.Budgets.GetBudgetByCategoryIdAsync(categoryId, userId, token).Returns((Budget?)null);
         uow.Budgets.GetBudgetByIdAsync(Arg.Any<Guid>(), userId, token).Returns(budgetEntity);
         uow.Complete(token).Returns(true);
 

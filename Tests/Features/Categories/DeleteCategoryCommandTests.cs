@@ -27,7 +27,7 @@ public class DeleteCategoryCommandTests
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
 
-        uow.Categories.GetCategoryByIdAsync(categoryId, userId, token).Returns((Category)null!);
+        uow.Categories.GetCategoryByIdAsync(categoryId, userId, token).Returns((Category?)null);
         var command = new DeleteCategoryCommand(categoryId, userId);
 
         //Act

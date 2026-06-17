@@ -28,7 +28,7 @@ public class GetExpenseByIdQueryTests
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
 
-        uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns((Expense)null!);
+        uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns((Expense?)null);
         var query = new GetExpenseByIdQuery(expenseId, userId);
 
         //Act
@@ -64,18 +64,6 @@ public class GetExpenseByIdQueryTests
                 UserId = userId
             }
         };
-
-        var expected = new ExpenseReadDto
-        (
-            Id: expenseId,
-            Amount: 20.99m,
-            Description: "Description Test",
-            Date: DateOnly.FromDateTime(DateTime.UtcNow),
-            CreatedAt: DateTime.UtcNow.AddDays(-1),
-            CategoryId: categoryId,
-            CategoryName: "Category Name Test",
-            CategoryColor: "#000000"
-        );
 
         uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns(expense);
         var query = new GetExpenseByIdQuery(expenseId, userId);

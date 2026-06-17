@@ -26,7 +26,7 @@ public class GetBudgetByIdQueryTests
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
 
-        uow.Budgets.GetBudgetByIdAsync(budgetId, userId, token).Returns((Budget) null!);
+        uow.Budgets.GetBudgetByIdAsync(budgetId, userId, token).Returns((Budget?)null);
         var query = new GetBudgetByIdQuery(budgetId, userId);
 
         //Act

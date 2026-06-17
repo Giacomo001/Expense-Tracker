@@ -27,7 +27,7 @@ public class DeleteExpenseCommandTests
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
 
-        uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns((Expense)null!);
+        uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns((Expense?)null);
         var command = new DeleteExpenseCommand(expenseId, userId);
 
         //Act
