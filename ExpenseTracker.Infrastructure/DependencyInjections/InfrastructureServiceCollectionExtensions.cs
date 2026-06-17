@@ -47,6 +47,7 @@ public static class InfrastructureServiceCollectionExtensions
         //Repositories Injection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
+        services.AddScoped<IRecurringExpenseRepository, RecurringExpenseRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         //Services Injection

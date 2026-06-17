@@ -78,7 +78,7 @@ public class UpdateExpenseCommandTests
         updateValidator.ValidateAsync(Arg.Any<ExpenseUpdateDto>(), Arg.Any<CancellationToken>())
             .Returns(new ValidationResult());
 
-        uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns((Expense)null!);
+        uow.Expenses.GetExpenseByIdAsync(expenseId, userId, token).Returns((Expense?)null);
         var command = new UpdateExpenseCommand(dto, expenseId, userId);
 
         //Act

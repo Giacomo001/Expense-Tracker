@@ -26,7 +26,7 @@ public class DeleteBudgetCommandTests
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
 
-        uow.Budgets.GetBudgetByIdAsync(budgetId, userId, token).Returns((Budget)null!);
+        uow.Budgets.GetBudgetByIdAsync(budgetId, userId, token).Returns((Budget?)null);
         var command = new DeleteBudgetCommand(budgetId, userId);
 
         //Act

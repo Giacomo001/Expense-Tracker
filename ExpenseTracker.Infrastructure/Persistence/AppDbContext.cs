@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> opt) : IdentityDbContex
     public DbSet<Budget> Budgets => Set<Budget>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<RecurringExpense> RecurringExpenses => Set<RecurringExpense>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)

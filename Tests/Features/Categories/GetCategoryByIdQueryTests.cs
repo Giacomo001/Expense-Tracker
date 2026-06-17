@@ -30,7 +30,7 @@ public class GetCategoryByIdQueryTests
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
 
-        uow.Categories.GetCategoryByIdAsync(categoryId, userId, token).Returns((Category)null!);
+        uow.Categories.GetCategoryByIdAsync(categoryId, userId, token).Returns((Category?)null);
         var query = new GetCategoryByIdQuery(categoryId, userId);
 
         //Act
