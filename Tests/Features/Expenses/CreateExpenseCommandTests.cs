@@ -65,6 +65,7 @@ public class CreateExpenseCommandTests
         var categoryId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var token = CancellationToken.None;
+        
         var expenseCreate = new ExpenseCreateDto
         (
             Amount: 20.99m,

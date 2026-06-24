@@ -35,8 +35,16 @@ public record RecurringExpenseCreateDto
     Guid CategoryId
 );
 
+//Used to create a new instance of the entity 'RecurringExpense'
+public record RecurringExpenseConfirmDto(
+    decimal Amount,
+    string? Description,
+    bool UpdateTemplate //TRUE = the template is updated for every future instance, FALSE = amount/description changed for one instance only
+);
+
 public record RecurringExpenseUpdateDto
 (
     decimal? Amount,
-    string? Description
+    string? Description,
+    Frequency? Frequency
 );

@@ -22,6 +22,20 @@ public static class RecurringExpenseMapper
         );
     } 
 
+    public static RecurringExpenseDueDto RecurringExpenseDueToReadDto(this RecurringExpense expense)
+    {
+        return new RecurringExpenseDueDto
+        (
+            Id: expense.Id,
+            Amount: expense.Amount,
+            Description: expense.Description,
+            Frequency: expense.Frequency,
+            CategoryId: expense.CategoryId,
+            CategoryName: expense.Category?.Name ?? string.Empty,
+            CategoryColor: expense.Category?.Color ?? "#94A3B8"
+        );
+    } 
+
     public static RecurringExpense RecurringExpenseCreateToEntity(this RecurringExpenseCreateDto dto, Guid userId, DateOnly? nextDueDate)
     {
         return new RecurringExpense

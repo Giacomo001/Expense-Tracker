@@ -36,7 +36,8 @@ public class UpdateRecurringExpenseCommandTests
         var dto = new RecurringExpenseUpdateDto
         (
             Amount: 20.99m,
-            Description: "Description Test"
+            Description: "Description Test",
+            Frequency: null
         );
 
         updateValidator.ValidateAsync(Arg.Any<RecurringExpenseUpdateDto>(), Arg.Any<CancellationToken>())
@@ -67,7 +68,8 @@ public class UpdateRecurringExpenseCommandTests
         var dto = new RecurringExpenseUpdateDto
         (
             Amount: 20.99m,
-            Description: "Description Test"
+            Description: "Description Test",
+            Frequency: null
         );
 
         updateValidator.ValidateAsync(Arg.Any<RecurringExpenseUpdateDto>(), Arg.Any<CancellationToken>())
@@ -100,7 +102,8 @@ public class UpdateRecurringExpenseCommandTests
         var dto = new RecurringExpenseUpdateDto
         (
             Amount: 20.99m,
-            Description: "Description Test"
+            Description: "Description Test",
+            Frequency: null
         );
 
         var entity = new RecurringExpense
@@ -116,6 +119,7 @@ public class UpdateRecurringExpenseCommandTests
             {
                 Id = categoryId,
                 Name = "Category Name Test",
+                Color = "#000000",
                 UserId = userId
             }
         };
@@ -151,7 +155,8 @@ public class UpdateRecurringExpenseCommandTests
         var dto = new RecurringExpenseUpdateDto
         (
             Amount: 20.99m,
-            Description: "Description Test"
+            Description: "Description Test",
+            Frequency: null
         );
 
         var entity = new RecurringExpense
@@ -167,6 +172,7 @@ public class UpdateRecurringExpenseCommandTests
             {
                 Id = categoryId,
                 Name = "Category Name Test",
+                Color = "#000000",
                 UserId = userId
             }
         };
@@ -187,6 +193,114 @@ public class UpdateRecurringExpenseCommandTests
         result.Value.Frequency.Should().Be(Frequency.Weekly);
         result.Value.NextDueDate.Should().Be(nextDueDate);
         result.Value.Description.Should().Be("Description Test");
+        await uow.Received(1).Complete(token);
+    }
+
+    //Check to recalculate the NextDueDate
+    [Fact]
+    public async Task UpdateRecurringExpenseCommand_Should_RecalculateNextDueDate_When_FrequencyChanges()
+    {
+        //Arrange
+        var recurringExpenseId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var token = CancellationToken.None;
+        var currentNextDueDate = DateOnly.FromDateTime(DateTime.Today);
+
+        var entity = new RecurringExpense
+        {
+            Id = recurringExpenseId,
+            Amount = 500m,
+            Description = "Test",
+            UserId = userId,
+            Frequency = Frequency.Monthly,
+            NextDueDate = currentNextDueDate,
+            CategoryId = categoryId,
+            Category = new Category
+            {
+                Id = categoryId,
+                Name = "Test",
+                Color = "#000000",
+                UserId = userId
+            }
+        };
+
+        var dto = new RecurringExpenseUpdateDto
+        (
+            Amount: null,
+            Description: null,
+            Frequency: Frequency.Weekly  //It will change from Monthly to Weekly
+        );
+
+        updateValidator.ValidateAsync(Arg.Any<RecurringExpenseUpdateDto>(), Arg.Any<CancellationToken>())
+            .Returns(new ValidationResult());
+
+        uow.RecurringExpenses.GetRecurringExpenseByIdAsync(recurringExpenseId, userId, token).Returns(entity);
+        uow.Complete(token).Returns(true);
+
+        var command = new UpdateRecurringExpenseCommand(dto, recurringExpenseId, userId);
+
+        //Act
+        var result = await sut.Handle(command, token);
+
+        //Assert
+        result.IsError.Should().BeFalse();
+        entity.Frequency.Should().Be(Frequency.Weekly);
+        entity.NextDueDate.Should().Be(RecurrenceDateCalculatorService.Calculate(currentNextDueDate, Frequency.Weekly));
+        await uow.Received(1).Complete(token);
+    }
+
+    [Fact]
+    public async Task UpdateRecurringExpenseCommand_Should_NotRecalculateNextDueDate_When_FrequencyNotChanged()
+    {
+        //Arrange
+        var recurringExpenseId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var token = CancellationToken.None;
+        var currentNextDueDate = DateOnly.FromDateTime(DateTime.Today);
+
+        var entity = new RecurringExpense
+        {
+            Id = recurringExpenseId,
+            Amount = 500m,
+            Description = "Test",
+            UserId = userId,
+            Frequency = Frequency.Monthly,
+            NextDueDate = currentNextDueDate,
+            CategoryId = categoryId,
+            Category = new Category
+            {
+                Id = categoryId,
+                Name = "Test",
+                Color = "#000000",
+                UserId = userId
+            }
+        };
+
+        var dto = new RecurringExpenseUpdateDto
+        (
+            Amount: 200m,
+            Description: null,
+            Frequency: null  //Frequency doesn't change
+        );
+
+        updateValidator.ValidateAsync(Arg.Any<RecurringExpenseUpdateDto>(), Arg.Any<CancellationToken>())
+            .Returns(new ValidationResult());
+
+        uow.RecurringExpenses.GetRecurringExpenseByIdAsync(recurringExpenseId, userId, token).Returns(entity);
+        uow.Complete(token).Returns(true);
+
+        var command = new UpdateRecurringExpenseCommand(dto, recurringExpenseId, userId);
+
+        //Act
+        var result = await sut.Handle(command, token);
+
+        //Assert
+        result.IsError.Should().BeFalse();
+        entity.Frequency.Should().Be(Frequency.Monthly); //No changes
+        entity.NextDueDate.Should().Be(currentNextDueDate); //No changes
+        entity.Amount.Should().Be(200m); //Updated
         await uow.Received(1).Complete(token);
     }
 }

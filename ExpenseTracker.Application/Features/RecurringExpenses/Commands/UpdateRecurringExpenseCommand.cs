@@ -3,6 +3,7 @@ using ErrorOr;
 using ExpenseTracker.Application.DTOs;
 using ExpenseTracker.Application.Interfaces.Repositories;
 using ExpenseTracker.Application.Mappers;
+using ExpenseTracker.Application.Utils;
 using FluentValidation;
 using MediatR;
 
@@ -30,6 +31,15 @@ public class UpdateRecurringExpenseHandler(IUnitOfWork uow,
         if(recurringExpenseDb is null) return Error.NotFound("RecurringExpense.NotFound", "The recurring expense could not be found.");
 
         request.Dto.UpdateRecurringExpenseEntity(recurringExpenseDb);
+
+        //Managing the Frequency and consequently the 'NextDueDate'
+        if(request.Dto.Frequency.HasValue && request.Dto.Frequency != recurringExpenseDb.Frequency)
+        {
+            recurringExpenseDb.Frequency = request.Dto.Frequency.Value;
+            recurringExpenseDb.NextDueDate = RecurrenceDateCalculatorService
+                .Calculate(recurringExpenseDb.NextDueDate ?? DateOnly.FromDateTime(DateTime.Today), request.Dto.Frequency.Value);
+        }
+
         if(!await uow.Complete(token)) return Error.Failure("RecurringExpense.Failure", "There has been a problem during the update of the recurring expense.");
 
         return recurringExpenseDb.RecurringExpenseToReadDto();

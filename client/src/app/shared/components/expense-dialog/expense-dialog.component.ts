@@ -6,6 +6,7 @@ import { ToastService } from '@core/services/toast/toast.service';
 import { CategoryRead } from '@features/categories/models/category.model';
 import { ExpenseCreate, ExpenseRead, ExpenseUpdate } from '@features/expenses/models/expense.model';
 import { ExpensesService } from '@features/expenses/services/expenses.service';
+import { Frequency } from '@features/recurring-expenses/models/frequency.enum';
 
 export interface ExpenseDialogData {
   expense: ExpenseRead | null;
@@ -41,6 +42,7 @@ export class ExpenseDialogComponent implements OnInit {
   // PROPERTIES 
   // ============================================================
   protected isEditMode = this.data?.expense !== null;
+  protected readonly frequencies = Object.values(Frequency); //Object.values(Frequency) => takes all the values in the Enum and creates an array
 
   //Labels
   protected modeLabel = this.isEditMode ? 'Update' : 'Create';
@@ -72,7 +74,11 @@ export class ExpenseDialogComponent implements OnInit {
       categoryId: [
         this.data.expense?.categoryId ?? '',
         Validators.required
-      ]
+      ],
+      //The 'Frequency' field is only visible in the Create mode
+      ...(!this.isEditMode && {
+        frequency: [Frequency.Manual, Validators.required]
+      })
     });
   }
 

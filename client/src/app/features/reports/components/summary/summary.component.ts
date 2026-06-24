@@ -44,7 +44,7 @@ export class SummaryComponent {
       year,
       month,
       label: new Date(year, month - 1, 1)
-        .toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }),
+        .toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
       total: expenses
         .filter(e => {
           const [y, m] = e.date.toString().split('-').map(Number);

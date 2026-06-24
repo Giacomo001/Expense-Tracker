@@ -1,0 +1,115 @@
+<div class="p-6 flex flex-col gap-5 w-full max-w-lg" style="min-width: 35rem;">
+  <!-- Header -->
+  <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+    <div class="flex items-center gap-2">
+      <mat-icon style="font-size: 1.1rem; color: var(--color-primary)">notifications_active</mat-icon>
+      <h2 class="text-sm font-medium text-primary tracking-wide uppercase">Recurring Expense Due</h2>
+    </div>
+    @if (totalCount > 1) {
+      <span class="text-xs text-secondary-light">{{ currentIndex() + 1 }} / {{ totalCount }}</span>
+    }
+  </div>
+
+  @if (!showUpdateTemplateStep()) {
+    <!-- STEP 1 — Confirm / Skip / Stop -->
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          [style.background-color]="currentExpense.categoryColor + '20'">
+          <span class="w-3 h-3 rounded-full" [style.background-color]="currentExpense.categoryColor"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-gray-900 truncate">
+            {{ currentExpense.description ?? currentExpense.categoryName }}
+          </p>
+          <p class="text-[11px] text-secondary-light mt-0.5">
+            {{ currentExpense.categoryName }} · {{ currentExpense.frequency }}
+          </p>
+        </div>
+        <span class="text-sm font-medium text-gray-700 flex-shrink-0">
+          € {{ currentExpense.amount | number:'1.2-2' }}
+        </span>
+      </div>
+    </div>
+
+    <form [formGroup]="confirmForm" class="flex flex-col gap-3">
+      <!-- Amount -->
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-secondary">Amount</label>
+        <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all"
+          [class.border-error]="confirmForm.get('amount')?.invalid && confirmForm.get('amount')?.touched">
+          <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">euro</mat-icon>
+          <input type="number" formControlName="amount" placeholder="0.00" step="0.01"
+            class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none placeholder-secondary-light h-full" />
+        </div>
+        @if (confirmForm.get('amount')?.hasError('required') && confirmForm.get('amount')?.touched) {
+          <span class="text-xs text-error mt-0.5">Amount is required</span>
+        }
+      </div>
+
+      <!-- Description -->
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-secondary">Description <span class="text-secondary-light">(optional)</span></label>
+        <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all">
+          <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">notes</mat-icon>
+          <input type="text" formControlName="description" placeholder="e.g. Netflix subscription..."
+            class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none placeholder-secondary-light h-full" />
+        </div>
+      </div>
+    </form>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between gap-2">
+      <button type="button" (click)="stop()"
+        class="px-4 h-9 rounded-lg border border-[var(--color-error)] text-sm text-[var(--color-error)]
+          bg-white hover:bg-gray-50 transition-all cursor-pointer">
+        Don't remind me again
+      </button>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="skip()"
+          class="px-4 h-9 rounded-lg border border-gray-200 text-sm text-secondary
+            bg-white hover:bg-gray-50 transition-all cursor-pointer">
+          Skip
+        </button>
+        <button type="button" (click)="confirm()" [disabled]="confirmForm.invalid"
+          class="px-4 h-9 rounded-lg text-sm text-white transition-all cursor-pointer border-none"
+          [style.background-color]="confirmForm.valid ? 'var(--color-primary)' : 'var(--color-disable)'"
+          [class.cursor-not-allowed]="confirmForm.invalid">
+          Confirm
+        </button>
+      </div>
+    </div>
+  } @else {
+    <!-- STEP 2 — Update template? -->
+    <div class="flex flex-col gap-4">
+      <p class="text-sm text-gray-700">
+        You changed the amount or description. Do you want to update the template for all future occurrences?
+      </p>
+      <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <div class="flex-1 flex flex-col gap-0.5">
+          <span class="text-xs text-secondary-light">New amount</span>
+          <span class="text-sm font-medium text-gray-900">€ {{ confirmForm.value.amount | number:'1.2-2' }}</span>
+        </div>
+        @if (confirmForm.value.description) {
+          <div class="flex-1 flex flex-col gap-0.5">
+            <span class="text-xs text-secondary-light">New description</span>
+            <span class="text-sm font-medium text-gray-900">{{ confirmForm.value.description }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-2">
+      <button type="button" (click)="confirmWithTemplateUpdate(false)"
+        class="px-4 h-9 rounded-lg border border-gray-200 text-sm text-secondary
+          bg-white hover:bg-gray-50 transition-all cursor-pointer">
+        Only this time
+      </button>
+      <button type="button" (click)="confirmWithTemplateUpdate(true)"
+        class="px-4 h-9 rounded-lg text-sm text-white bg-primary
+          transition-all cursor-pointer border-none">
+        Update all future
+      </button>
+    </div>
+  }
+</div>

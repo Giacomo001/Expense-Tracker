@@ -1,3 +1,5 @@
+import { Frequency } from "@features/recurring-expenses/models/frequency.enum"
+
 export interface ExpenseRead
 {
     id: string,
@@ -16,6 +18,7 @@ export interface ExpenseCreate
     description?: string,
     date: Date, //DateOnly,
     categoryId: string,
+    frequency: Frequency
 }
 
 export interface ExpenseUpdate 
