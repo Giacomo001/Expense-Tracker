@@ -1,20 +1,20 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CalendarComponent } from "@layout/calendar/calendar.component";
-import { ExpenseRead } from '@features/expenses/models/expense.model';
 import { AppStateService } from '@core/services/state/app-state.service';
 import { RouterOutlet } from '@angular/router';
 import { ExpensesService } from '@features/expenses/services/expenses.service';
 import { ToastService } from '@core/services/toast/toast.service';
-import { CategoryRead } from '@features/categories/models/category.model';
 import { CategoriesService } from '@features/categories/services/categories.service';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { CategoriesComponent } from '@features/categories/categories.component';
 import { BudgetsService } from '@features/budgets/services/budgets.service';
-import { BudgetRead } from '@features/budgets/models/budget.model';
+import { RecurringExpensesService } from '@features/recurring-expenses/services/recurring-expenses.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RecurringExpenseDueDialogComponent } from '@shared/components/recurring-expense-due-dialog/recurring-expense-due-dialog.component';
 
 @Component({
   selector: 'app-layout-base',
-  imports: [RouterOutlet, CategoriesComponent, CalendarComponent],
+  imports: [RouterOutlet, MatDialogModule, CategoriesComponent, CalendarComponent],
   templateUrl: './layout-base.component.html',
   styleUrl: './layout-base.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,10 +24,12 @@ export class LayoutBaseComponent implements OnInit {
   // INJECT
   //============================================================
   private appStateService = inject(AppStateService);
-  private expensesService = inject(ExpensesService);
-  private categoriesService = inject(CategoriesService);
   private budgetsService = inject(BudgetsService);
+  private categoriesService = inject(CategoriesService);
+  private expensesService = inject(ExpensesService);
+  private recurringExpensesService = inject(RecurringExpensesService);
   private toastService = inject(ToastService);
+  private dialog = inject(MatDialog);
 
   //============================================================
   // PROPERTIES
@@ -54,20 +56,42 @@ export class LayoutBaseComponent implements OnInit {
   //============================================================
   private loadRecords() {
     const request$ = forkJoin({
-      expenses: this.expensesService.getExpenses(),
+      budgets: this.budgetsService.getBudgetsByUserId(),
       categories: this.categoriesService.getCategories(),
-      budgets: this.budgetsService.getBudgetsByUserId()
+      expenses: this.expensesService.getExpenses(),
+      recurringExpenses: this.recurringExpensesService.getAllRecurringExpensesByUserId()
     });
 
     request$.subscribe({
-      next: ({ expenses, categories, budgets }) => {
+      next: ({ budgets, categories, expenses, recurringExpenses }) => {
         //All lists are populated here since it's the parent component
-        this.appStateService.expensesList.set(expenses);
-        this.appStateService.categoriesList.set(categories);
         this.appStateService.budgetsList.set(budgets);
+        this.appStateService.categoriesList.set(categories);
+        this.appStateService.expensesList.set(expenses);
+        this.appStateService.recurringExpensesList.set(recurringExpenses);
       },
       error: _ => {
         this.toastService.error("There was an error loading the records.");
+      }
+    });
+
+    //Due Recurring Expenses are outside the 'ForkJoin' because they need to trigger the create Expense dialog
+    this.recurringExpensesService.getDueRecurringExpensesByUserId().pipe(
+      catchError(() => {
+        this.toastService.error("There was an error loading the due recurring expenses.");
+        return of([]);
+      })
+    ).subscribe({
+      next: exps => {
+        this.appStateService.dueRecurringExpensesList.set(exps);
+
+        if (exps && exps.length > 0) {
+          this.dialog.open(RecurringExpenseDueDialogComponent, {
+            data: { dueExpenses: exps },
+            disableClose: true,
+            minWidth: '34rem'
+          });
+        }
       }
     });
   }

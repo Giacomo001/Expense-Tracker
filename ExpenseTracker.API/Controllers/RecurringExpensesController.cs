@@ -77,4 +77,38 @@ public class RecurringExpensesController(IMediator mediator) : BaseApiController
             errors => Problem(errors)
         );
     }
+
+    //Methods to handle the RecurringExpense after the user's input
+    [HttpPost("{id:guid}/confirm")]
+    public async Task<IActionResult> ConfirmRecurringExpense(Guid id, [FromBody] RecurringExpenseConfirmDto dto, CancellationToken token)
+    {
+        var result = await mediator.Send(new ConfirmRecurringExpenseCommand(dto, id, UserId));
+
+        return result.Match(
+            expense => Ok(expense),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPost("{id:guid}/skip")]
+    public async Task<IActionResult> SkipRecurringExpense(Guid id, CancellationToken token)
+    {
+        var result = await mediator.Send(new SkipRecurringExpenseCommand(id, UserId));
+
+        return result.Match(
+            _ => NoContent(),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPost("{id:guid}/stop")]
+    public async Task<IActionResult> StopRecurringExpense(Guid id, CancellationToken token)
+    {
+        var result = await mediator.Send(new StopRecurringExpenseCommand(id, UserId));
+
+        return result.Match(
+            _ => NoContent(),
+            errors => Problem(errors)
+        );
+    }
 }

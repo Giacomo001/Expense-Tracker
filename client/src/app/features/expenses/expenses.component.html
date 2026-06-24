@@ -88,7 +88,7 @@
     </div>
     <div class="text-right flex-shrink-0">
       <p class="text-sm font-medium text-gray-700">- € {{ expense.amount | number:'1.2-2' }}</p>
-      <p class="text-[10px] text-secondary-light mt-0.5">{{ expense.date | date:'d MMM':'':'it-IT' }}</p>
+      <p class="text-[10px] text-secondary-light mt-0.5">{{ expense.date | date:'d MMM':'':'en-US' }}</p>
     </div>
     <div class="hidden group-hover:flex items-center gap-1 flex-shrink-0">
       <button type="button" (click)="openEditDialog(expense); $event.stopPropagation()"

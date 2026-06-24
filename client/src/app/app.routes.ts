@@ -24,6 +24,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('@features/budgets/budgets.component').then(m => m.BudgetsComponent)
       },
+      {
+        path: 'recurring-expenses',
+        loadComponent: () =>
+          import('@features/recurring-expenses/recurring-expenses.component').then(m => m.RecurringExpensesComponent)
+      },
       { 
         path: '', 
         redirectTo: 'expenses', 

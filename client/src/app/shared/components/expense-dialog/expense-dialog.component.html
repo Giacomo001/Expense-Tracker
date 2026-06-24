@@ -70,6 +70,22 @@
         <span class="text-xs text-error mt-0.5">Category is required</span>
       }
     </div>
+
+    <!-- Frequency -->
+    @if (!isEditMode) {
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-secondary">Frequency</label>
+        <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all">
+          <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">repeat</mat-icon>
+          <select formControlName="frequency"
+            class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none h-full cursor-pointer">
+            @for (freq of frequencies; track freq) {
+              <option [value]="freq">{{ freq }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
   </form>
 
   <div class="flex items-center justify-end gap-2">
