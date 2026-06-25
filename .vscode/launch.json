@@ -22,12 +22,11 @@
       "request": "launch",
       "preLaunchTask": "ng serve",
       "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}/client/src",
+      "webRoot": "${workspaceFolder}/client",
       "sourceMaps": true,
+      "pauseForSourceMap": true,
       "sourceMapPathOverrides": {
-        "webpack:///./*": "${webRoot}/*",
-        "webpack:///src/*": "${webRoot}/*",
-        "webpack:///*": "*"
+        "/workspace/client/*": "${workspaceFolder}/client/*"
       }
     }
   ],
