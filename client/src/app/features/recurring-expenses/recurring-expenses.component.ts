@@ -32,18 +32,25 @@ export class RecurringExpensesComponent {
   // ============================================================
   protected recExpensesList = this.appStateService.recurringExpensesList;
   protected currentMonthLabel = this.appStateService.currentMonthLabel;
+  protected selectedCategoryId = this.appStateService.selectedCategoryId;
   
   // ============================================================
   // COMPUTED
   // ============================================================
-  protected recurringExpensesSorted = computed(() =>
+  protected recurringExpensesSorted = computed(() => {
+    const categoryId = this.selectedCategoryId();
+
+    console.log(categoryId);
+
     //Ordering the lists from the closest to the current date to the furthest from it
-    [...this.recExpensesList()].sort((a, b) => {
+    return [...this.recExpensesList()]
+    .filter(r => categoryId ? r.categoryId === categoryId : true) //Category filter
+    .sort((a, b) => {
       if (!a.nextDueDate) return 1;
       if (!b.nextDueDate) return -1;
       return new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime();
     })
-  );
+  });
 
   // ============================================================
   // PROPERTIES
