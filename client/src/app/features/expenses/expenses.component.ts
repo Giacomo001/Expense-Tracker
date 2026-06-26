@@ -39,6 +39,9 @@ export class ExpensesComponent {
   protected viewYear = this.appStateService.viewYear;
   protected viewMonth = this.appStateService.viewMonth;
 
+  //Manage the actions for tablet/smartphone
+  protected activeExpenseId = signal<string | null>(null);
+
   // ============================================================
   // COMPUTED
   // ============================================================
@@ -120,7 +123,9 @@ export class ExpensesComponent {
         expense: null,
         categories: this.appStateService.categoriesList(),
         selectedDate: this.selectedDate()
-      } satisfies ExpenseDialogData
+      } satisfies ExpenseDialogData,
+      width: '100%',
+      maxWidth: '35rem',
     });
 
     ref.afterClosed().subscribe(result => {
@@ -170,5 +175,11 @@ export class ExpensesComponent {
         }
       });
     });
+  }
+
+  //Actions
+  toggleExpenseActions(id: string, event: Event) {
+    event.stopPropagation();
+    this.activeExpenseId.update(current => current === id ? null : id);
   }
 }

@@ -1,6 +1,6 @@
 <div class="p-6 flex flex-col gap-5 w-full max-w-sm">
   <!-- Header -->
-  <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+  <div class="flex items-center justify-between border-b border-[var(--color-gray-100)] pb-4">
     <div class="flex items-center gap-2">
       <mat-icon style="font-size: 1.2rem; color: var(--color-primary)">folder</mat-icon>
       <h2 class="text-sm font-medium text-primary tracking-wide uppercase">{{ modeLabel }} Category</h2>
@@ -13,11 +13,11 @@
 
   <!-- Form -->
   <form [formGroup]="categoryForm" class="flex flex-col gap-1">
-    <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all"
+    <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-[var(--color-gray-200)] bg-white focus-within:border-primary transition-all"
       [class.border-error]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched">
       <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">label</mat-icon>
       <input type="text" formControlName="name" placeholder="Category name"
-        class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none placeholder-secondary-light h-full" />
+        class="flex-1 bg-transparent text-sm text-[var(--color-gray-900)] outline-none border-none placeholder-secondary-light h-full" />
     </div>
     @if (categoryForm.get('name')?.hasError('required') && categoryForm.get('name')?.touched) {
       <span class="text-xs text-error mt-0.5">Category name is required</span>

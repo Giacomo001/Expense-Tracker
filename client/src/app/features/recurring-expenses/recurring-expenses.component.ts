@@ -68,7 +68,9 @@ export class RecurringExpensesComponent {
       data: {
         recurringExpense: null,
         categories: this.appStateService.categoriesList()
-      } satisfies RecurringExpenseDialogData
+      } satisfies RecurringExpenseDialogData,
+      width: '100%',
+      maxWidth: '35rem',
     });
 
     ref.afterClosed().subscribe(result => {

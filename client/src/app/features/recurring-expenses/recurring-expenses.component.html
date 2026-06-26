@@ -1,6 +1,6 @@
-<main class="flex flex-col gap-3 p-4 h-full overflow-y-auto bg-gray-50">
+<main class="flex flex-col gap-3 p-4 overflow-y-auto bg-[var(--color-gray-50)] grow">
   <div class="flex items-center justify-between">
-    <span class="text-sm font-medium text-gray-900 capitalize">{{ currentMonthLabel() }}</span>
+    <span class="text-sm font-medium text-[var(--color-gray-900)] capitalize">{{ currentMonthLabel() }}</span>
     <button
       (click)="openCreateDialog()"
       class="flex items-center gap-1 px-3 py-1.5
@@ -13,20 +13,20 @@
   <!-- TABS -->
   <app-tabs />
 
-  <hr class="border-gray-200">
+  <hr class="border-[var(--color-gray-200)]">
 
   @if (recurringExpensesSorted().length === 0) {
     <div class="flex flex-col items-center justify-center flex-1 gap-3 py-16 text-center">
       <div class="w-12 h-12 rounded-xl bg-info-light flex items-center justify-center">
         <mat-icon class="text-primary">repeat</mat-icon>
       </div>
-      <p class="text-sm font-medium text-gray-900">No recurring expenses</p>
+      <p class="text-sm font-medium text-[var(--color-gray-900)]">No recurring expenses</p>
       <p class="text-xs text-secondary-light">Add a recurring expense to track your fixed costs</p>
     </div>
   } @else {
     <div class="flex flex-col gap-2">
       @for (item of recurringExpensesSorted(); track item.id) {
-        <div class="bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-3
+        <div class="bg-white border border-[var(--color-gray-200)] rounded-lg px-3 py-2 flex items-center gap-3
           hover:border-primary-light transition-all group cursor-pointer">
 
           <!-- COLOR DOT -->
@@ -38,7 +38,7 @@
           <!-- INFO -->
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
-              <p class="text-xs font-medium text-gray-900 truncate">
+              <p class="text-xs font-medium text-[var(--color-gray-900)] truncate">
                 {{ item.description ?? item.categoryName }}
               </p>
               <!-- FREQUENCY BADGE -->
@@ -51,15 +51,15 @@
 
           <!-- DUE DATE + AMOUNT -->
           <div class="flex flex-col items-end gap-0.5 flex-shrink-0">
-            <span class="text-sm font-medium text-gray-700">€ {{ item.amount | number:'1.2-2' }}</span>
+            <span class="text-sm font-medium text-[var(--color-gray-700)]">€ {{ item.amount | number:'1.2-2' }}</span>
 
             @let days = item.nextDueDate | daysUntil;
             @if (days === null) {
               <span class="text-[11px] text-secondary-light">Manual</span>
             } @else if (days <= 0) {
-              <span class="text-[11px] text-red-500 font-medium">Due today</span>
+              <span class="text-[11px] text-error font-medium">Due today</span>
             } @else if (days <= 3) {
-              <span class="text-[11px] text-orange-500 font-medium">In {{ days }} days</span>
+              <span class="text-[11px] text-[var(--color-warning)] font-medium">In {{ days }} days</span>
             } @else {
               @if (item.frequency === 'Annually' || item.frequency === 'Biennial') {
                 <span class="text-[11px] text-secondary-light">{{ item.nextDueDate | date:'d MMM yyyy':'':'en-US' }}</span>
@@ -70,7 +70,7 @@
           </div>
 
           <!-- ACTIONS -->
-          <div class="hidden group-hover:flex items-center gap-1 flex-shrink-0">
+          <div class="flex md:hidden md:group-hover:flex items-center gap-1 ml-auto flex-shrink-0">
             <button type="button"
               (click)="openEditDialog(item); $event.stopPropagation()"
               class="w-5 h-5 flex items-center justify-center rounded
