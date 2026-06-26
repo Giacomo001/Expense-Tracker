@@ -1,5 +1,5 @@
-<div class="p-6 flex flex-col gap-5 w-full max-w-lg" style="min-width: 35rem;">
-  <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+<div class="p-6 flex flex-col gap-5 w-full max-w-lg">
+  <div class="flex items-center justify-between border-b border-[var(--color-gray-100)] pb-4">
     <div class="flex items-center gap-2">
       <mat-icon style="font-size: 1.1rem; color: var(--color-primary)">repeat</mat-icon>
       <h2 class="text-sm font-medium text-primary tracking-wide uppercase">{{ modeLabel }} Recurring Expense</h2>
@@ -14,11 +14,11 @@
     <!-- Amount -->
     <div class="flex flex-col gap-1">
       <label class="text-xs font-medium text-secondary">Amount</label>
-      <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all"
+      <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-[var(--color-gray-200)] bg-white focus-within:border-primary transition-all"
         [class.border-error]="recurringExpenseForm.get('amount')?.invalid && recurringExpenseForm.get('amount')?.touched">
         <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">euro</mat-icon>
         <input type="number" formControlName="amount" placeholder="0.00" step="0.01"
-          class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none placeholder-secondary-light h-full" />
+          class="flex-1 bg-transparent text-sm text-[var(--color-gray-900)] outline-none border-none placeholder-secondary-light h-full" />
       </div>
       @if (recurringExpenseForm.get('amount')?.hasError('required') && recurringExpenseForm.get('amount')?.touched) {
         <span class="text-xs text-error mt-0.5">Amount is required</span>
@@ -31,21 +31,21 @@
     <!-- Description -->
     <div class="flex flex-col gap-1">
       <label class="text-xs font-medium text-secondary">Description <span class="text-secondary-light">(optional)</span></label>
-      <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all">
+      <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-[var(--color-gray-200)] bg-white focus-within:border-primary transition-all">
         <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">notes</mat-icon>
         <input type="text" formControlName="description" placeholder="e.g. Netflix subscription..."
-          class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none placeholder-secondary-light h-full" />
+          class="flex-1 bg-transparent text-sm text-[var(--color-gray-900)] outline-none border-none placeholder-secondary-light h-full" />
       </div>
     </div>
 
     <!-- Frequency -->
     <div class="flex flex-col gap-1">
       <label class="text-xs font-medium text-secondary">Frequency</label>
-      <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all"
+      <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-[var(--color-gray-200)] bg-white focus-within:border-primary transition-all"
         [class.border-error]="recurringExpenseForm.get('frequency')?.invalid && recurringExpenseForm.get('frequency')?.touched">
         <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">repeat</mat-icon>
         <select formControlName="frequency"
-          class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none h-full cursor-pointer">
+          class="flex-1 bg-transparent text-sm text-[var(--color-gray-900)] outline-none border-none h-full cursor-pointer">
            <option [value]="manual" disabled>Manual</option>
           @for (freq of frequencies; track freq) {
             <option [value]="freq">{{ freq }}</option>
@@ -62,11 +62,11 @@
       <!-- Category -->
       <div class="flex flex-col gap-1">
         <label class="text-xs font-medium text-secondary">Category</label>
-        <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all"
+        <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-[var(--color-gray-200)] bg-white focus-within:border-primary transition-all"
           [class.border-error]="recurringExpenseForm.get('categoryId')?.invalid && recurringExpenseForm.get('categoryId')?.touched">
           <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">folder</mat-icon>
           <select formControlName="categoryId"
-            class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none h-full cursor-pointer">
+            class="flex-1 bg-transparent text-sm text-[var(--color-gray-900)] outline-none border-none h-full cursor-pointer">
             <option value="" disabled>Select a category...</option>
             @for (category of data.categories; track category.id) {
               <option [value]="category.id">{{ category.name }}</option>
@@ -81,11 +81,11 @@
       <!-- Start Date -->
       <div class="flex flex-col gap-1">
         <label class="text-xs font-medium text-secondary">Start Date</label>
-        <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-gray-200 bg-white focus-within:border-primary transition-all"
+        <div class="flex items-center gap-3 px-3 h-11 rounded-lg border border-[var(--color-gray-200)] bg-white focus-within:border-primary transition-all"
           [class.border-error]="recurringExpenseForm.get('startDate')?.invalid && recurringExpenseForm.get('startDate')?.touched">
           <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: var(--color-secondary-light); flex-shrink: 0;">calendar_today</mat-icon>
           <input type="date" formControlName="startDate"
-            class="flex-1 bg-transparent text-sm text-gray-900 outline-none border-none h-full" />
+            class="flex-1 bg-transparent text-sm text-[var(--color-gray-900)] outline-none border-none h-full" />
         </div>
         @if (recurringExpenseForm.get('startDate')?.hasError('required') && recurringExpenseForm.get('startDate')?.touched) {
           <span class="text-xs text-error mt-0.5">Start date is required</span>

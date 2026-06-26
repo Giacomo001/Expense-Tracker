@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { CalendarComponent } from "@layout/calendar/calendar.component";
 import { AppStateService } from '@core/services/state/app-state.service';
 import { RouterOutlet } from '@angular/router';
@@ -11,10 +11,11 @@ import { BudgetsService } from '@features/budgets/services/budgets.service';
 import { RecurringExpensesService } from '@features/recurring-expenses/services/recurring-expenses.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RecurringExpenseDueDialogComponent } from '@shared/components/recurring-expense-due-dialog/recurring-expense-due-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-layout-base',
-  imports: [RouterOutlet, MatDialogModule, CategoriesComponent, CalendarComponent],
+  imports: [RouterOutlet, MatDialogModule, MatIconModule, CategoriesComponent, CalendarComponent],
   templateUrl: './layout-base.component.html',
   styleUrl: './layout-base.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,6 +40,8 @@ export class LayoutBaseComponent implements OnInit {
   //============================================================
   // SIGNALS
   //============================================================
+  protected isCategoriesOpen = signal(false);
+  protected isCalendarOpen = signal(false);
 
   //============================================================
   // COMPUTED
@@ -89,7 +92,8 @@ export class LayoutBaseComponent implements OnInit {
           this.dialog.open(RecurringExpenseDueDialogComponent, {
             data: { dueExpenses: exps },
             disableClose: true,
-            minWidth: '34rem'
+            width: '100%',
+            maxWidth: '35rem',
           });
         }
       }
@@ -106,4 +110,11 @@ export class LayoutBaseComponent implements OnInit {
     this.appStateService.viewYear.set(event.year);
     this.appStateService.viewMonth.set(event.month);
   }
+
+  //Method to manage the responsiveness of the smartphone/tablet
+  toggleCategories() { this.isCategoriesOpen.update(b => !b); }
+  toggleCalendar() { this.isCalendarOpen.update(b => !b); }
+
+  closeCategories() { this.isCategoriesOpen.set(false); }
+  closeCalendar() { this.isCalendarOpen.set(false); }
 }
