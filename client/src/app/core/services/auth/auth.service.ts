@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { AccountService } from '../account/account.service';
 import { TokenService } from '../token/token.service';
 import { LoginRequest, RegisterRequest } from '@features/auth/models/auth-request.model';
@@ -14,7 +13,6 @@ import { environment } from '@env/environment';
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private router = inject(Router);
   private accountService = inject(AccountService);
   private tokenService = inject(TokenService);
   private baseUrl = environment.apiUrl;
