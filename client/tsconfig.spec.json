@@ -1,17 +1,17 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
+    "rootDir": ".",
     "inlineSources": true,
     "inlineSourceMap": true,
-    "types": [
-      "vitest/globals"
-    ]
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "types": ["jest", "node", "jest-preset-angular"]
   },
   "include": [
     "src/**/*.d.ts",
-    "src/**/*.spec.ts"
+    "src/**/*.spec.ts",
+    "setup-jest.ts"
   ]
 }

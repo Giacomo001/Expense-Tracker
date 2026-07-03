@@ -97,7 +97,10 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "configPath": "jest.config.ts"
+          }
         }
       }
     }

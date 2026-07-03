@@ -1,18 +1,14 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoggedUser } from '@features/auth/models/logged-user.model';
 import { TokenService } from '../token/token.service';
-import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AccountService {
-  private http = inject(HttpClient);
   private router = inject(Router);
   private tokenService = inject(TokenService);
-  private baseUrl = environment.apiUrl;
 
   loggedUser = signal<LoggedUser | null>(this.loadFromStorage());
 

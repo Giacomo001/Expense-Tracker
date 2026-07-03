@@ -30,6 +30,6 @@ export class TokenService {
 
   //Method used by the AuthGuard to check if the User is logged in
   hasTokens(): boolean {
-    return this._accessToken() !== null && this.getRefreshToken !== null;
+    return this._accessToken() !== null && this.getRefreshToken() !== null;
   }
 }
