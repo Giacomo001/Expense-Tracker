@@ -1,14 +1,14 @@
 # Expense Tracker
 
-A full-stack personal finance management application built with **.NET 10** and **Angular 20**, following **Clean Architecture** principles and **CQRS** pattern.
+A full-stack personal finance management application built with **.NET 10** and **Angular 21**, following **Clean Architecture** principles and **CQRS** pattern.
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
-[![Angular](https://img.shields.io/badge/Angular-20-DD0031?style=flat&logo=angular)](https://angular.dev/)
+[![Angular](https://img.shields.io/badge/Angular-21-DD0031?style=flat&logo=angular)](https://angular.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
-> ⚠️ This project is currently under active development. Frontend is in progress.
+> ⚠️ This project is currently under active development. Testing is in progress.
 
 ---
 
@@ -49,7 +49,7 @@ flowchart TD
 ### Frontend
 | Technology | Purpose |
 |---|---|
-| Angular 20 | SPA Framework |
+| Angular 21 | SPA Framework |
 | Angular Material | UI Components |
 | TailwindCSS | Styling |
 
