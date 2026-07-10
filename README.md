@@ -8,7 +8,7 @@ A full-stack personal finance management application built with **.NET 10** and 
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
-> ⚠️ This project is currently under active development. Testing is in progress.
+> ⚠️ This project is currently under active development. Backend and frontend implementation are complete — currently in testing phase.
 
 ---
 
@@ -52,12 +52,16 @@ flowchart TD
 | Angular 21 | SPA Framework |
 | Angular Material | UI Components |
 | TailwindCSS | Styling |
+| Chart.js + ng2-charts | Charts and reports visualization |
+| ngx-skeleton-loader | Loading skeletons |
+| ngx-toastr | Toast notifications (success/error/loading) |
 
 ### Infrastructure
 | Technology | Purpose |
 |---|---|
 | Docker + Docker Compose | Containerization |
 | VS Code Dev Containers | Development environment |
+| Adminer | Database GUI |
 
 ### Testing
 | Technology | Purpose |
@@ -139,7 +143,12 @@ make update
 dotnet run --project ExpenseTracker.API
 ```
 
-The API will be available at `http://localhost:8080`.
+6. Start the frontend (in a separate terminal, inside the container):
+```bash
+cd client && ng serve --host 0.0.0.0
+```
+
+The API will be available at `http://localhost:8080`, the frontend at `http://localhost:4200`, and Adminer (DB GUI) at `http://localhost:8081`.
 
 ---
 
@@ -175,7 +184,6 @@ The solution is split by Clean Architecture layer. `ExpenseTracker.API` holds Co
 - [x] Authentication with JWT + Refresh Token
 - [x] Unit Tests
 - [x] Frontend — Angular
-- [x] Filtering and pagination on Expenses
 - [ ] Integration Tests
 
 ---
