@@ -2,28 +2,32 @@
 
 A full-stack personal finance management application built with **.NET 10** and **Angular 20**, following **Clean Architecture** principles and **CQRS** pattern.
 
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
+[![Angular](https://img.shields.io/badge/Angular-20-DD0031?style=flat&logo=angular)](https://angular.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
+
 > ⚠️ This project is currently under active development. Frontend is in progress.
 
 ---
 
 ## Architecture Overview
 
-The backend is structured following **Clean Architecture**, ensuring a clear separation of concerns and a unidirectional dependency flow:
+The backend follows **Clean Architecture**, with dependencies flowing in a single direction toward the core:
 
-```
-ExpenseTracker.API
-    ↓
-ExpenseTracker.Application
-    ↓
-ExpenseTracker.Domain
-    ↑
-ExpenseTracker.Infrastructure
+```mermaid
+flowchart TD
+    API["ExpenseTracker.API<br/>Controllers, Middleware, DI"]
+    APP["ExpenseTracker.Application<br/>CQRS (MediatR), Validators, DTOs"]
+    DOM["ExpenseTracker.Domain<br/>Entities"]
+    INFRA["ExpenseTracker.Infrastructure<br/>EF Core, Identity, JWT"]
+
+    API --> APP --> DOM
+    INFRA --> APP
 ```
 
-- **Domain** — Core entities with zero external dependencies
-- **Application** — Use cases implemented via CQRS (MediatR), validators (FluentValidation), and repository interfaces
-- **Infrastructure** — EF Core, PostgreSQL, ASP.NET Identity, JWT/Refresh Token implementation
-- **API** — REST controllers, middleware, and dependency injection configuration
+`ExpenseTracker.API` exposes REST controllers and depends only on `Application`, which holds the use cases — implemented as CQRS commands and queries via MediatR — and defines the repository interfaces without knowing how they're implemented. `ExpenseTracker.Infrastructure` implements those interfaces (EF Core, PostgreSQL, ASP.NET Core Identity, JWT/refresh token handling) and depends on `Application`, never the other way around. `ExpenseTracker.Domain` sits at the core with zero external dependencies — just entities and business rules.
 
 ---
 
@@ -151,31 +155,7 @@ Current coverage: **27 unit tests** across Commands, Queries, and Report aggrega
 
 ## Project Structure
 
-```
-/
-├── .devcontainer/              #Dev container configuration
-├── ExpenseTracker.API/         #Presentation layer
-│   ├── Controllers/
-│   ├── Middleware/
-│   └── DependencyInjections/
-├── ExpenseTracker.Application/ #Application layer
-│   ├── Features/               #CQRS Commands and Queries
-│   ├── DTOs/
-│   ├── Validators/
-│   ├── Mappers/
-│   └── Interfaces/
-├── ExpenseTracker.Domain/      #Domain layer
-│   └── Entities/
-├── ExpenseTracker.Infrastructure/ #Infrastructure layer
-│   ├── Persistence/
-│   ├── Identity/
-│   └── Services/
-├── Tests/                      #Unit tests
-│   ├── Features/
-│   ├── Validators/
-│   └── Mappers/
-└── client/                     #Angular frontend (in progress)
-```
+The solution is split by Clean Architecture layer. `ExpenseTracker.API` holds Controllers, Middleware and dependency injection setup — it's the only project that talks HTTP. `ExpenseTracker.Application` groups CQRS Features (Commands and Queries), DTOs, Validators, Mappers and the repository Interfaces the layer depends on. `ExpenseTracker.Domain` contains just the core Entities. `ExpenseTracker.Infrastructure` implements everything Application declares: Persistence (EF Core), Identity and external Services. `Tests` mirrors this split with Features, Validators and Mappers test suites, and `client` holds the Angular frontend, still in progress. `.devcontainer` at the root configures the VS Code development environment.
 
 ---
 
@@ -194,6 +174,12 @@ Current coverage: **27 unit tests** across Commands, Queries, and Report aggrega
 - [x] Backend — Clean Architecture + CQRS
 - [x] Authentication with JWT + Refresh Token
 - [x] Unit Tests
-- [ ] Frontend — Angular
-- [ ] Filtering and pagination on Expenses
+- [x] Frontend — Angular
+- [x] Filtering and pagination on Expenses
 - [ ] Integration Tests
+
+---
+
+## License
+
+Proprietary software. All rights reserved. Copying, distribution, or modification without explicit authorization from the repository owner is prohibited.
