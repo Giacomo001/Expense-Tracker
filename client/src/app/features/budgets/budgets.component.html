@@ -53,6 +53,7 @@
             <div class="flex items-center gap-2 flex-shrink-0">
               <span class="text-xs text-secondary-light">€</span>
               <input
+                data-testid="budget-amount-input"
                 type="number"
                 min="0"
                 [value]="editingAmount()"
@@ -62,11 +63,13 @@
                 (keydown.enter)="saveBudget(item.id, item.budget)"
                 (keydown.escape)="cancelEdit()">
               <button type="button" (click)="saveBudget(item.id, item.budget)"
+                data-testid="save-budget-btn"
                 class="w-6 h-6 flex items-center justify-center rounded
                   bg-[var(--color-accent)] border-none cursor-pointer">
                 <mat-icon style="color: white; font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">check</mat-icon>
               </button>
               <button type="button" (click)="cancelEdit()"
+                data-testid="cancel-edit-btn"
                 class="w-6 h-6 flex items-center justify-center rounded
                   hover:bg-[var(--color-gray-100)] border-none bg-transparent cursor-pointer">
                 <mat-icon style="color: var(--color-secondary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">close</mat-icon>
@@ -81,6 +84,7 @@
               }
               <div class="flex lg:hidden lg:group-hover:flex items-center gap-1 flex-shrink-0">
                 <button type="button"
+                  data-testid="edit-or-add-budget-btn"
                   (click)="startEditing(item.id, item.budget?.amount ?? null)"
                   class="w-5 h-5 flex items-center justify-center rounded
                     hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
@@ -90,6 +94,7 @@
                 </button>
                 @if (item.budget) {
                   <button type="button"
+                    data-testid="delete-budget-btn"
                     (click)="deleteBudget(item.budget)"
                     class="w-5 h-5 flex items-center justify-center rounded
                       hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
