@@ -96,7 +96,7 @@ export class BudgetsComponent {
         {
           loading: 'Updating budget...',
           success: 'Budget updated!',
-          error: err => err?.error?.title ?? 'An error occurred'
+          error: (err: unknown) => this.getErrorMessage(err)
         }
       ).subscribe({
         next: updated => {
@@ -115,7 +115,7 @@ export class BudgetsComponent {
         {
           loading: 'Creating budget...',
           success: 'Budget created!',
-          error: err => err?.error?.title ?? 'An error occurred'
+          error: (err: unknown) => this.getErrorMessage(err)
         }
       ).subscribe({
         next: created => {
@@ -139,7 +139,7 @@ export class BudgetsComponent {
         {
           loading: 'Deleting budget...',
           success: 'Budget deleted!',
-          error: err => err?.error?.title ?? 'An error occurred'
+          error: (err: unknown) => this.getErrorMessage(err)
         }
       ).subscribe({
         next: () => {
@@ -148,5 +148,9 @@ export class BudgetsComponent {
         }
       })
     });
+  }
+
+  private getErrorMessage(err: unknown): string {
+    return (err as { error?: { title?: string } })?.error?.title ?? 'An error occurred';
   }
 }
