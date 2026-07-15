@@ -7,6 +7,7 @@ A full-stack personal finance management application built with **.NET 10** and 
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
+[![Last Commit](https://img.shields.io/github/last-commit/Giacomo001/expense-tracker)]()
 
 > ⚠️ This project is currently under active development. Backend and frontend implementation are complete — currently in testing phase.
 
@@ -76,7 +77,9 @@ flowchart TD
 
 ### Authentication
 - Register and login with JWT access token
-- Refresh token rotation with SHA-256 hashing
+- Refresh token delivered via httpOnly, Secure cookie — never exposed to client-side JavaScript
+- Refresh token rotation with SHA-256 hashing and reuse detection
+- CSRF protection via double-submit cookie pattern (antiforgery token)
 - Token revocation (logout)
 - NIST-compliant password policy
 - Account lockout after failed attempts
@@ -164,17 +167,26 @@ Current coverage: **27 unit tests** across Commands, Queries, and Report aggrega
 
 ## Project Structure
 
-The solution is split by Clean Architecture layer. `ExpenseTracker.API` holds Controllers, Middleware and dependency injection setup — it's the only project that talks HTTP. `ExpenseTracker.Application` groups CQRS Features (Commands and Queries), DTOs, Validators, Mappers and the repository Interfaces the layer depends on. `ExpenseTracker.Domain` contains just the core Entities. `ExpenseTracker.Infrastructure` implements everything Application declares: Persistence (EF Core), Identity and external Services. `Tests` mirrors this split with Features, Validators and Mappers test suites, and `client` holds the Angular frontend, still in progress. `.devcontainer` at the root configures the VS Code development environment.
+The solution is split by Clean Architecture layer:
+- `ExpenseTracker.API` holds Controllers, Middleware and dependency injection setup — it's the only project that talks HTTP.
+- `ExpenseTracker.Application` groups CQRS Features (Commands and Queries), DTOs, Validators, Mappers and the repository Interfaces the layer depends on.
+- `ExpenseTracker.Domain` contains just the core Entities.
+- `ExpenseTracker.Infrastructure` implements everything Application declares: Persistence (EF Core), Identity and external Services.
+- `client` holds the Angular frontend, still in progress.
+- `Tests` mirrors this split with Features, Validators and Mappers test suites.
+- `.devcontainer` at the root configures the VS Code development environment.
 
 ---
 
 ## Security Highlights
 
-- Passwords require minimum 12 characters with uppercase, lowercase, digit, and special character
-- Account lockout after 5 failed attempts for 15 minutes
-- Refresh tokens stored as SHA-256 hashes — plain tokens never persisted
-- JWT `ClockSkew` set to zero for strict expiration enforcement
-- User data fully isolated — repository queries always filter by `UserId`
+- Passwords require minimum 12 characters with uppercase, lowercase, digit, and special character.
+- Account lockout after 5 failed attempts for 15 minutes.
+- Refresh token stored in an HttpOnly, Secure cookie scoped to /api/auth — never accessible to client-side JavaScript, and stored server-side as a SHA-256 hash.
+- Refresh token reuse detection: replaying an already-used token revokes all active tokens for that user.
+- CSRF protection on refresh/revoke endpoints via double-submit cookie (XSRF-TOKEN / X-XSRF-TOKEN).
+- JWT ClockSkew set to zero for strict expiration enforcement.
+- User data fully isolated — repository queries always filter by UserId.
 
 ---
 
