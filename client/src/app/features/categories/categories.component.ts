@@ -7,6 +7,7 @@ import { ConfirmDialogData, DeleteDialogComponent } from '@shared/components/del
 import { AppStateService } from '@core/services/state/app-state.service';
 import { CategoriesService } from './services/categories.service';
 import { CategoryRead } from './models/category.model';
+import { AuthService } from '@core/services/auth/auth.service';
 
 @Component({
   selector: 'app-categories',
@@ -22,6 +23,7 @@ export class CategoriesComponent {
   private categoriesService = inject(CategoriesService);
   private appStateService = inject(AppStateService);
   private toastService = inject(ToastService);
+  private authService = inject(AuthService);
   private dialog = inject(MatDialog);
 
   //============================================================
@@ -105,5 +107,9 @@ export class CategoriesComponent {
         }
       });
     });
+  }
+
+  protected logout() {
+    this.authService.logoutLocally();
   }
 }

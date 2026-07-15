@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       //If 401 and a refresh token exists, attempt to refresh the access token
-      if(error.status === 401 && tokenService.getRefreshToken()) {
+      if(error.status === 401) {
         return authService.refresh().pipe(
           switchMap(() => {
             //Retry the original request with the new access token
@@ -22,7 +22,8 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
           }),
           catchError(refreshError => {
             //Refresh failed — session is expired, logout the user
-            authService.revoke();
+            tokenService.clearAccessToken();
+            authService['accountService'].logout();
             return throwError(() => refreshError);
           })
         );
