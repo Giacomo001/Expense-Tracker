@@ -26,12 +26,11 @@ export class AccountService {
     //Removes the data from token to loggedUser
     sessionStorage.removeItem('user');
     this.loggedUser.set(null);
+    this.tokenService.clearAccessToken();
   }
 
   logout() {
     this.removeLocalData();
-    this.tokenService.clearTokens();
-
     this.router.navigateByUrl("auth/login");
   }
 }

@@ -13,6 +13,7 @@ import localeIt from '@angular/common/locales/it';
 import { AuthService } from '@core/services/auth/auth.service';
 import { TokenService } from '@core/services/token/token.service';
 import { catchError, firstValueFrom, of } from 'rxjs';
+import { AccountService } from '@core/services/account/account.service';
 
 registerLocaleData(localeIt);
 
@@ -30,14 +31,12 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'it-IT' },
     provideAppInitializer(async () => { //It creates silently a new RefreshToken so refreshing the page won't require a new login all the times
       const authService = inject(AuthService);
-      const tokenService = inject(TokenService);
-
-      if (!tokenService.getRefreshToken()) return;
+      const accountService = inject(AccountService);
 
       await firstValueFrom(
         authService.refresh().pipe(
           catchError(() => {
-            tokenService.clearTokens();
+            accountService.removeLocalData(); //Remove both the token and the loggedUser
             return of(null);
           })
         )

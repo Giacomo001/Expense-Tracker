@@ -91,6 +91,15 @@ public class AuthService(
             return Error.Unauthorized("Auth.RefreshToken", "Invalid or expired token.");
         }
 
+        if(storedToken.IsRevoked)
+        {
+            //Check if an old - already rotated - token is reused
+            //If it is, it revokes EVERY token from the User
+            await uow.Tokens.RevokeAllByUserIdAsync(storedToken.UserId, token);
+            await uow.Complete(token);
+            return Error.Unauthorized("Auth.RefreshToken", "Token reuse detected. All sessions revoked.");
+        }
+
         var user = await userManager.FindByIdAsync(storedToken.UserId.ToString());
         if(user is null) return Error.Unauthorized("Auth.RefreshToken", "User not found.");
 

@@ -7,12 +7,10 @@ export const authInitializerProvider = provideAppInitializer(async () => {
   const authService = inject(AuthService);
   const tokenService = inject(TokenService);
 
-  if (!tokenService.getRefreshToken()) return;
-
   await firstValueFrom(
     authService.refresh().pipe(
       catchError(() => {
-        tokenService.clearTokens();
+        tokenService.clearAccessToken();
         return of(null);
       })
     )

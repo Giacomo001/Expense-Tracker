@@ -27,6 +27,7 @@ public class BaseApiController : ControllerBase
             ErrorType.NotFound => NotFound(new { firstError.Code, firstError.Description }),
             ErrorType.Conflict => Conflict(new { firstError.Code, firstError.Description }),
             ErrorType.Unauthorized => Unauthorized(new { firstError.Code, firstError.Description }),
+            ErrorType.Forbidden => StatusCode(StatusCodes.Status403Forbidden, new { firstError.Code, firstError.Description }),
             _ => StatusCode(500, new { firstError.Code, firstError.Description })
         };
     }

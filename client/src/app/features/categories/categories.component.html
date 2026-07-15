@@ -47,4 +47,14 @@
       <mat-icon class="text-base">add</mat-icon>
       Add category
     </div>
+
+    <div class="border-t border-[var(--color-gray-200)] pt-2 mt-auto">
+      <button type="button"
+        (click)="logout()"
+        class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-error font-medium
+        hover:bg-error-light transition-all border-none bg-transparent cursor-pointer text-left">
+        <mat-icon style="color: var(--color-error);" class="text-base">logout</mat-icon>
+        Logout
+      </button>
+    </div>
   </aside>

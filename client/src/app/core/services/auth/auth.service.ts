@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { AccountService } from '../account/account.service';
 import { TokenService } from '../token/token.service';
 import { LoginRequest, RegisterRequest } from '@features/auth/models/auth-request.model';
-import { Observable, tap } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { AuthResponse } from '@features/auth/models/auth-response.model';
 import { LoggedUser } from '@features/auth/models/logged-user.model';
 import { environment } from '@env/environment';
@@ -18,38 +18,37 @@ export class AuthService {
   private baseUrl = environment.apiUrl;
 
   registration(register: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, register).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, register, { withCredentials: true }).pipe(
       tap(response => this.handleAuthResponse(response))
     );
   }
 
   login(login: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, login).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, login, { withCredentials: true }).pipe(
       tap(response => this.handleAuthResponse(response))
     );
   }
 
   refresh(): Observable<AuthResponse> {
-    const refreshToken = this.tokenService.getRefreshToken();
-
     //{ refreshToken } because the backend expects a JSON object, not a simple string
-    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/refresh`, { refreshToken }).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/refresh`, {}, { withCredentials: true }).pipe(
       tap(response => this.handleAuthResponse(response))
     );
   }
 
   revoke(): Observable<void> {
-    const refreshToken = this.tokenService.getRefreshToken();
-    
-    return this.http.post<void>(`${this.baseUrl}/auth/revoke`, { refreshToken }).pipe(
-      tap(() => this.accountService.logout())
+    return this.http.post<void>(`${this.baseUrl}/auth/revoke`, {}, { withCredentials: true }).pipe(
+      tap(() => this.accountService.logout()),
+      catchError(err => {
+        this.accountService.logout();
+        return throwError(() => err);
+      })
     );
   }
 
   private handleAuthResponse(response: AuthResponse) {
-    //Saves the tokens
+    //The RefreshToken is already saved as cookie HttpOnly in the response
     this.tokenService.setAccessToken(response.accessToken);
-    this.tokenService.setRefreshToken(response.refreshToken);
 
     //Saves logged user
     const user: LoggedUser = {
@@ -57,5 +56,10 @@ export class AuthService {
       email: response.email
     };
     this.accountService.setLoggedUser(user);
+  }
+
+  logoutLocally(): void {
+    //Local clean-up without a HTTP call. Used by the Interceptor when refresh does not work
+    this.accountService.logout();
   }
 }

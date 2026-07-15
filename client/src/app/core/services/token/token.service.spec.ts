@@ -35,75 +35,40 @@ describe('TokenService', () => {
   });
 
   // ================================================
-  // getRefreshToken
+  // clearAccessToken
   // ================================================
-  describe('getRefreshToken', () => {
-    it('should return null when sessionStorage is empty', () => {
-      expect(service.getRefreshToken()).toBeNull();
-    });
-
-    it('should return the token after setRefreshToken is called', () => {
-      service.setRefreshToken('mock-refresh-token');
-      expect(service.getRefreshToken()).toBe('mock-refresh-token');
-    });
-  });
-
-  // ================================================
-  // setRefreshToken
-  // ================================================
-  describe('setRefreshToken', () => {
-    it('should store the refresh token in sessionStorage', () => {
-      service.setRefreshToken('mock-refresh-token');
-      expect(sessionStorage.getItem('refreshToken')).toBe('mock-refresh-token');
-    });
-  });
-
-  // ================================================
-  // clearTokens
-  // ================================================
-  describe('clearTokens', () => {
+  describe('clearAccessToken', () => {
     it('should set the access token signal to null', () => {
       //Arrange
       //Set a token first so we can verify it gets cleared
       service.setAccessToken('mock-access-token');
 
-      service.clearTokens();
+      service.clearAccessToken();
 
       expect(service.getAccessToken()).toBeNull();
-    });
-
-    it('should remove the refresh token from sessionStorage', () => {
-      //Arrange
-      service.setRefreshToken('mock-refresh-token');
-
-      service.clearTokens();
-
-      expect(sessionStorage.getItem('refreshToken')).toBeNull();
     });
   });
 
   // ================================================
-  // hasTokens
+  // hasAccessToken
   // ================================================
-  describe('hasTokens', () => {
+  describe('hasAccessToken', () => {
     it('should return false when both tokens are missing', () => {
-      expect(service.hasTokens()).toBe(false);
+      expect(service.hasAccessToken()).toBe(false);
     });
 
     it('should return false when only accessToken is set', () => {
       service.setAccessToken('mock-access-token');
-      expect(service.hasTokens()).toBe(false);
+      expect(service.hasAccessToken()).toBe(false);
     });
 
     it('should return false when only refreshToken is set', () => {
-      service.setRefreshToken('mock-refresh-token');
-      expect(service.hasTokens()).toBe(false);
+      expect(service.hasAccessToken()).toBe(false);
     });
 
     it('should return true when both tokens are set', () => {
       service.setAccessToken('mock-access-token');
-      service.setRefreshToken('mock-refresh-token');
-      expect(service.hasTokens()).toBe(true);
+      expect(service.hasAccessToken()).toBe(true);
     });
   });
 });

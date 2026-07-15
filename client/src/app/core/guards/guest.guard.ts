@@ -7,7 +7,7 @@ export const guestGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   //If no tokens, the user is a guest and can access Login/Registration page
-  if(!tokenService.hasTokens()) return true;
+  if(!tokenService.hasAccessToken()) return true;
 
   //Already authenticated. User goes on the homepage
   return router.createUrlTree(['/']);

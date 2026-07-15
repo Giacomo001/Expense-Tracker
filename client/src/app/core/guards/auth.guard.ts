@@ -7,7 +7,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   //If tokens exist, the user has an active session
-  if(tokenService.hasTokens()) return true;
+  if(tokenService.hasAccessToken()) return true;
 
   //No tokens, user gets sent to Login page
   //CreateUrlTree is not as imperative as NavigateByUrl. Better usage for Guards
