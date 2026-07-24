@@ -48,6 +48,8 @@ describe("BudgetsComponent", () => {
     ];
 
     beforeEach(async () => {
+        jest.resetAllMocks();
+
         await TestBed.configureTestingModule({
             imports: [BudgetsComponent],
             providers: [
@@ -258,7 +260,7 @@ describe("BudgetsComponent", () => {
     describe("saveBudget", () => {
         it("should return early if amount is invalid (NULL or <= 0)", () => {
             compAny.editingAmount.set(null);
-            compAny.saveBudget("cat-1", 100);
+            compAny.saveBudget("cat-1", null);
 
             //The collateral effect of the subscrition is tracked
             expect(toastServiceMock.loading).not.toHaveBeenCalled();
@@ -284,10 +286,24 @@ describe("BudgetsComponent", () => {
 
             expect(updatedBudget?.amount).toBe(150);
             expect(compAny.editingCategoryId()).toBeNull();
+            //Check if 'updateBudger' was called
+            expect(budgetServiceMock.updateBudget).toHaveBeenCalledWith(initialBudget.id, expect.objectContaining({ amount: 150 }));
         });
 
         it("should call createBudget and append to the list when existingBudget is null", () => {
+            const newBudget: BudgetRead = { id: 'bud-3', amount: 200, categoryId: 'cat-2', categoryName: 'Rent', categoryColor: '#0000ff' };
 
+            appStateService.budgetsList.set([mockBudgets[0]]); //Only cat-1 has a budget initially
+
+            budgetServiceMock.createBudget.mockReturnValue(of(newBudget));
+            toastServiceMock.loading.mockReturnValue(of(newBudget));
+
+            compAny.editingAmount.set(200);
+            compAny.saveBudget('cat-2', null); //No existing budget for cat-2
+
+            expect(budgetServiceMock.createBudget).toHaveBeenCalled();
+            expect(appStateService.budgetsList()).toContainEqual(newBudget);
+            expect(compAny.editingCategoryId()).toBeNull();
         });
     });
 
