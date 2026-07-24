@@ -8,10 +8,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { RegisterSecurityPanelComponent } from "@shared/components/register-security-panel/register-security-panel.component";
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RouterLink],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RouterLink, RegisterSecurityPanelComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -87,8 +88,8 @@ export class RegisterComponent implements OnInit {
         error: (err) => err?.error?.message ?? 'There was an error during the registration'
       }
     ).subscribe({
-      next: () => {
-        this.router.navigateByUrl('/auth/login');
+      next: async () => {
+        await this.router.navigateByUrl('/auth/login');
         this.registerForm.reset();
       }
     });

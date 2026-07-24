@@ -9,12 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { ChartData, ChartOptions, Chart, ArcElement, Tooltip, DoughnutController } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-
-Chart.register(ArcElement, Tooltip, DoughnutController);
+import { AuthChartsComponent } from "@shared/components/charts/auth-charts/auth-charts.component";
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RouterLink, BaseChartDirective],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, RouterLink, AuthChartsComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,40 +32,16 @@ export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   loginForm: FormGroup = new FormGroup({});
   protected hidePassword: boolean = true;
-
-  // ============================================================
-  // GRAPHS
-  // ============================================================
-  protected readonly donutOptions: ChartOptions<'doughnut'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '65%',
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: false }
-    }
-  };
-
-  protected readonly chartColors = ['#60A5FA', '#34D399', '#FBBF24', '#F472B6', '#A78BFA'];
-
-  protected readonly februaryData: ChartData<'doughnut'> = {
-    labels: ['Food', 'Rent', 'Transport', 'Hobbies', 'Other'],
-    datasets: [{
-      data: [35, 28, 15, 12, 10],
-      backgroundColor: this.chartColors,
-      borderWidth: 0
-    }]
-  };
-
-  protected readonly yearData: ChartData<'doughnut'> = {
-    labels: ['Food', 'Rent', 'Transport', 'Hobbies', 'Other'],
-    datasets: [{
-      data: [30, 32, 18, 10, 10],
-      backgroundColor: this.chartColors,
-      borderWidth: 0
-    }]
-  };
   
+  //Getters to simplify the html file
+  protected get email() {
+    return this.loginForm.get('email');
+  };
+
+  protected get password() {
+    return this.loginForm.get('password');
+  };
+
   // ============================================================
   // LIFE CYCLES
   // ============================================================
@@ -80,15 +55,7 @@ export class LoginComponent implements OnInit {
   private initializeForm() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.email, Validators.required]],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.maxLength(128),
-          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/)
-        ]
-      ]
+      password: ['', [Validators.required]]
     });
   }
 

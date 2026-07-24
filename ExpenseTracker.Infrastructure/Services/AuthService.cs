@@ -128,6 +128,7 @@ public class AuthService(
     //PRIVATE METHODS
     private async Task<AuthResponseDto> GenerateAuthResponseAsync(User user, CancellationToken token)
     {
+        //Both the AccessToken and the RefreshToken are generated here
         var accessToken = jwtService.GenerateToken(user.Id, user.Email!, user.UserName!);
         var (refreshToken, refreshTokenHash) = jwtService.GenerateRefreshToken();
 
