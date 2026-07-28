@@ -2,6 +2,7 @@
   <div class="flex items-center justify-between">
     <span class="text-sm font-medium text-[var(--color-gray-900)] capitalize">{{ currentMonthLabel() }}</span>
     <button
+      data-testid="create-recurring-expense-btn"
       (click)="openCreateDialog()"
       class="flex items-center gap-1 px-3 py-1.5
         bg-accent text-white hover:bg-accent-hover
@@ -72,19 +73,20 @@
           <!-- ACTIONS -->
           <div class="flex md:hidden md:group-hover:flex items-center gap-1 ml-auto flex-shrink-0">
             <button type="button"
+              data-testid="edit-recurring-expense-btn"
               (click)="openEditDialog(item); $event.stopPropagation()"
               class="w-5 h-5 flex items-center justify-center rounded
                 hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
               <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">edit</mat-icon>
             </button>
             <button type="button"
+              data-testid="delete-recurring-expense-btn"
               (click)="deleteRecurringExpense(item); $event.stopPropagation()"
               class="w-5 h-5 flex items-center justify-center rounded
                 hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
               <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
             </button>
           </div>
-
         </div>
       }
     </div>

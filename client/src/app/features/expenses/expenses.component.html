@@ -3,6 +3,7 @@
   <div class="flex items-center justify-between">
     <span class="text-sm font-medium text-[var(--color-gray-900)] capitalize">{{ currentMonthLabel() }}</span>
     <button
+      data-testid="create-expense-btn"
       (click)="openCreateDialog()" 
       class="flex items-center gap-1 px-3 py-1.5 
         bg-accent text-white
@@ -77,7 +78,8 @@
 <!-- Reusable expense card template -->
 <ng-template #expenseCard let-expense="expense">
   <div class="bg-white border border-[var(--color-gray-200)] h-15 rounded-lg px-3 py-2 flex items-center gap-3 cursor-pointer hover:border-primary-light transition-all group"
-    (click)="toggleExpenseActions(expense.id, $event)">
+    (click)="toggleExpenseActions(expense.id, $event)"
+    data-testid="expense-card">
 
     <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
       [style.background-color]="expense.categoryColor + '20'">
@@ -100,10 +102,12 @@
     @if (activeExpenseId() === expense.id) {
       <div class="flex items-center gap-1 flex-shrink-0">
         <button type="button" (click)="openEditDialog(expense); $event.stopPropagation()"
+          data-testid="edit-expense-btn"
           class="w-7 h-7 flex items-center justify-center rounded hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
           <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">edit</mat-icon>
         </button>
         <button type="button" (click)="deleteExpense(expense.id, expense.description ?? '-', title); $event.stopPropagation()"
+          data-testid="delete-expense-btn"
           class="w-7 h-7 flex items-center justify-center rounded hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
           <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
         </button>
@@ -111,10 +115,12 @@
     } @else {
       <div class="hidden lg:group-hover:flex items-center gap-1 flex-shrink-0">
         <button type="button" (click)="openEditDialog(expense); $event.stopPropagation()"
+          data-testid="edit-expense-btn"
           class="w-7 h-7 flex items-center justify-center rounded hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
           <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">edit</mat-icon>
         </button>
         <button type="button" (click)="deleteExpense(expense.id, expense.description ?? '-', title); $event.stopPropagation()"
+          data-testid="delete-expense-btn"
           class="w-7 h-7 flex items-center justify-center rounded hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
           <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
         </button>

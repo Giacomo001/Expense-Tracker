@@ -42,7 +42,8 @@ export function getNextMonth(year: number, month: number): { year: number; month
 }
 
 export function getTwoMonthsAhead(year: number, month: number): { year: number; month: number } {
-  return month == 12 ? { year: year + 1, month: 2 } : { year, month: month + 2 };
+  const { year: y1, month: m1 } = getNextMonth(year, month);
+  return getNextMonth(y1, m1);
 }
 
 export function getMonthLabel(year: number, month: number): string {

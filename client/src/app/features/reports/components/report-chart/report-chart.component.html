@@ -4,6 +4,7 @@
     <div class="flex gap-2">
       @for (view of views; track view) {
         <button
+          [attr.data-testid]="'view-' + view + '-btn'"
           (click)="setView(view)"
           [class]="activeView() === view
             ? 'px-3 py-1 rounded-full text-xs font-medium bg-[var(--color-accent)] text-white border-none cursor-pointer'
@@ -14,6 +15,7 @@
     </div>
 
     <button (click)="exportPdf()" 
+      data-testid="export-pdf-btn"
       class="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-[var(--color-accent)] 
       text-white rounded-lg text-xs font-medium border-none cursor-pointer hover:bg-[var(--color-accent-hover)] duration-300">
       <mat-icon style="font-size: 0.9rem; width: 0.9rem; height: 0.9rem; color: white;">download</mat-icon>
@@ -27,7 +29,9 @@
       <span class="text-xs text-gray-400">Total this month</span>
       <span class="text-sm font-medium text-gray-900">€ {{ grandTotal() | number:'1.2-2' }}</span>
       @if (deltaVsPrevious() !== null) {
-        <span class="text-[11px]" [class]="deltaVsPrevious()! > 0 ? 'text-red-500' : 'text-green-600'">
+        <span class="text-[11px]" 
+          [class]="deltaVsPrevious()! > 0 ? 'text-red-500' : 'text-green-600'"
+          data-testid="delta-vs-previous">
           {{ deltaVsPrevious()! > 0 ? '+' : '' }}{{ deltaVsPrevious()! | number:'1.1-1' }}% vs prev
         </span>
       }

@@ -15,6 +15,7 @@
 
     @for (category of categoriesList(); track category.id) {
       <div (click)="selectCategory(category.id)"
+        data-testid="category-row"
         class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all group"
         [class.bg-info-light]="selectedCategoryId() === category.id"
         [class.border-primary-light]="selectedCategoryId() === category.id"
@@ -28,11 +29,13 @@
 
         <div class="flex lg:hidden lg:group-hover:flex items-center gap-1 ml-auto flex-shrink-0">
           <button type="button"
+            data-testid="edit-category-btn"
             (click)="openEditDialog(category); $event.stopPropagation()"
             class="w-5 h-5 flex items-center justify-center rounded hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
             <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">edit</mat-icon>
           </button>
           <button type="button"
+            data-testid="delete-category-btn"
             (click)="deleteCategory(category.id, category.name, title ); $event.stopPropagation()"
             class="w-5 h-5 flex items-center justify-center rounded hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
             <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
@@ -43,13 +46,16 @@
 
     <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-secondary-light 
       border border-dashed border-[var(--color-gray-200)] mt-2 cursor-pointer"
-      (click)="openCreateDialog()">
+      (click)="openCreateDialog()"
+      data-testid="add-category-div"
+      >
       <mat-icon class="text-base">add</mat-icon>
       Add category
     </div>
 
     <div class="border-t border-[var(--color-gray-200)] pt-2 mt-auto">
       <button type="button"
+        data-testid="logout-category-btn"
         (click)="logout()"
         class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-error font-medium
         hover:bg-error-light transition-all border-none bg-transparent cursor-pointer text-left">
