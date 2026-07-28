@@ -77,6 +77,6 @@ export class CategoryDialogComponent implements OnInit {
   }
 
   protected cancel() {
-    this.dialogRef.close();
+    this.dialogRef.close(null);
   }
 }

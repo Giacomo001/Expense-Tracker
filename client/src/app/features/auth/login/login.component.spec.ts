@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginComponent } from './login.component';
-import { EmailValidator, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth/auth.service';
 import { ToastService } from '@core/services/toast/toast.service';
-import { Router } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
 
@@ -13,6 +13,8 @@ describe("LoginComponent", () => {
     // ================================================
     let component: LoginComponent;
     let fixture: ComponentFixture<LoginComponent>;
+    let router: Router;
+    let navigateByUrlSpy: jest.SpyInstance;
 
     let compAny: any;
 
@@ -26,9 +28,9 @@ describe("LoginComponent", () => {
         error: jest.fn()
     };
 
-    const routerMock = {
-        navigateByUrl: jest.fn()
-    };
+    beforeAll(() => {
+        HTMLCanvasElement.prototype.getContext = jest.fn() as any;
+    });
 
     beforeEach(async () => {
         jest.resetAllMocks();
@@ -36,11 +38,20 @@ describe("LoginComponent", () => {
         await TestBed.configureTestingModule({
             imports: [LoginComponent, ReactiveFormsModule],
             providers: [
+                //provideRouter creates a REAL Router instance to satisfy RouterLink/ActivatedRoute
+                //dependencies used inside the template. Do NOT also override Router with a plain
+                //object ({ provide: Router, useValue: {...} }) — provideRouter's internal providers
+                //expect a real Router instance (they read internal state like `.root`), and a fake
+                //object breaks that chain with "Cannot read properties of undefined (reading 'root')".
+                //Instead, spy on the real instance's method.
+                provideRouter([]),
                 { provide: AuthService, useValue: authServiceMock },
                 { provide: ToastService, useValue: toastServiceMock },
-                { provide: Router, useValue: routerMock }
             ]
         }).compileComponents();
+
+        router = TestBed.inject(Router);
+        navigateByUrlSpy = jest.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
 
         fixture = TestBed.createComponent(LoginComponent);
         component = fixture.componentInstance;
@@ -49,10 +60,10 @@ describe("LoginComponent", () => {
         fixture.detectChanges();
     });
 
-    //Form helper
+    //Form helper — loginForm is `protected`, so it must be accessed via compAny
     const fillForm = (email: string, password: string) => {
-        component.loginForm.patchValue({ email, password });
-        component.loginForm.markAllAsTouched();
+        compAny.loginForm.patchValue({ email, password });
+        compAny.loginForm.markAllAsTouched();
         fixture.detectChanges();
     };
 
@@ -62,33 +73,32 @@ describe("LoginComponent", () => {
     describe("loginForm Validator", () => {
         //it.each loops the matrix (array of array) and check each case
         it.each([
-            ['', '', false], //Both email and password are empty
-            ['test.test', 'password', false], //Both filled but email is invalid
-            ['test@test.test', '', false], //Email is valid but password is empty
-            ['test@test.test', 'password', true] //Both are filled and valid
-            //("email=%s password=%s -> form valid=%s", (email, password, expected) gives the "title" to the it() for each case
+            ['', '', false],                         //both email and password are empty
+            ['test.test', 'Password1', false],        //both filled but email is invalid
+            ['test@test.test', '', false],             //email is valid but password is empty
+            ['test@test.test', 'Password1', true],     //both are filled and valid
         ])("email=%s password=%s -> form valid=%s", (email, password, expected) => {
             fillForm(email, password);
 
-            expect(component.loginForm.valid).toBe(expected);
+            expect(compAny.loginForm.valid).toBe(expected);
         });
 
-        it("should flag email as invalid with email' error on malformed value", () => {
+        it("should flag email as invalid with 'email' error on malformed value", () => {
             fillForm('test.test', 'password');
 
-            expect(component.loginForm.get('email')?.hasError('email')).toBe(true);
+            expect(compAny.loginForm.get('email')?.hasError('email')).toBe(true);
         });
 
         it("should flag email as invalid with 'required' error when empty", () => {
             fillForm('', 'password');
 
-            expect(component.loginForm.get('email')?.hasError('required')).toBe(true);
+            expect(compAny.loginForm.get('email')?.hasError('required')).toBe(true);
         });
 
         it("should flag password as invalid with 'required' error when empty", () => {
             fillForm('test@test.test', '');
 
-            expect(component.loginForm.get('password')?.hasError('required')).toBe(true);
+            expect(compAny.loginForm.get('password')?.hasError('required')).toBe(true);
         });
     });
 
@@ -133,15 +143,14 @@ describe("LoginComponent", () => {
 
         it("should navigate to '/' and reset the form on successful login", async () => {
             toastServiceMock.loading.mockReturnValue(of({ token: 'fake' }));
-            routerMock.navigateByUrl.mockResolvedValue(true);
             fillForm('test@test.test', 'password');
 
             compAny.login();
             //navigateByUrl is awaited inside the subscribe callback
             await Promise.resolve();
 
-            expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/');
-            expect(component.loginForm.value.email).toBeFalsy(); //LoginForm is reset after the 'navigateByUrl'
+            expect(navigateByUrlSpy).toHaveBeenCalledWith('/');
+            expect(compAny.loginForm.value.email).toBeFalsy(); //loginForm is reset after navigateByUrl
         });
 
         it("should NOT navigate when login fails", () => {
@@ -150,7 +159,7 @@ describe("LoginComponent", () => {
 
             compAny.login();
 
-            expect(routerMock.navigateByUrl).not.toHaveBeenCalled();
+            expect(navigateByUrlSpy).not.toHaveBeenCalled();
         });
 
         it("should keep form values when login fails", () => {
@@ -159,7 +168,7 @@ describe("LoginComponent", () => {
 
             compAny.login();
 
-            expect(component.loginForm.value.email).toBe('test@test.com');
+            expect(compAny.loginForm.value.email).toBe('test@test.com');
         });
     });
 
@@ -167,28 +176,30 @@ describe("LoginComponent", () => {
     // DOM
     // ================================================
     describe("template interaction", () => {
-        //Standard variables for the buttons would throw an error
         const getSubmitBtn = () => fixture.debugElement.query(By.css('button[type="submit"]'));
         const getPasswordInput = () => fixture.debugElement.query(By.css('input[formControlName="password"]'));
-        const getVibilityToggleBtn = () => fixture.debugElement.query(By.css('[data-testid="toggle-password-visibility"]'));
+        const getVisibilityToggleBtn = () => fixture.debugElement.query(By.css('[data-testid="toggle-password-visibility"]'));
 
         describe("submit button", () => {
             it("should be disabled when form is invalid", () => {
                 expect(getSubmitBtn().nativeElement.disabled).toBe(true);
             });
-    
+
             it("should be enabled when form is valid", () => {
                 fillForm('test@test.test', 'password');
 
                 expect(getSubmitBtn().nativeElement.disabled).toBe(false);
             });
-    
+
             it("should call login on click", () => {
-                toastServiceMock.loading().mockReturnValue(of({ token: 'fake' }));
+                //NOTE: previously this called toastServiceMock.loading() (invoking the mock)
+                //instead of configuring it — that returned undefined and made login() crash
+                //before reaching navigateByUrl. Configure the mock's return value instead.
+                toastServiceMock.loading.mockReturnValue(of({ token: 'fake' }));
                 fillForm('test@test.test', 'password');
                 const spy = jest.spyOn(compAny, 'login');
 
-                getSubmitBtn().nativeElement.click(); //Button is clicked
+                getSubmitBtn().nativeElement.click();
 
                 expect(spy).toHaveBeenCalled();
             });
@@ -198,34 +209,33 @@ describe("LoginComponent", () => {
             it("should default to type 'password' with hidePassword=true", () => {
                 expect(getPasswordInput().nativeElement.type).toBe('password');
             });
-    
+
             it("should switch input type to 'text' on toggle click", () => {
-                getVibilityToggleBtn().nativeElement.click();
+                getVisibilityToggleBtn().nativeElement.click();
                 fixture.detectChanges();
 
                 expect(getPasswordInput().nativeElement.type).toBe('text');
             });
-    
+
             it("should switch back to type 'password' on second toggle click", () => {
-                //Double click
-                getVibilityToggleBtn().nativeElement.click();
-                getVibilityToggleBtn().nativeElement.click();
+                getVisibilityToggleBtn().nativeElement.click();
+                getVisibilityToggleBtn().nativeElement.click();
                 fixture.detectChanges();
 
                 expect(getPasswordInput().nativeElement.type).toBe('password');
             });
         });
-    
+
         describe("validation error message", () => {
             it("should show 'required' error for email only after touched", () => {
                 let error = fixture.debugElement.query(By.css('mat-error'));
                 expect(error).toBeNull();
 
-                fillForm('', ''); //Form is invalid
+                fillForm('', ''); //form is invalid and touched
 
                 error = fixture.debugElement.query(By.css('mat-error'));
                 expect(error).not.toBeNull();
             });
         });
     });
-})
+});

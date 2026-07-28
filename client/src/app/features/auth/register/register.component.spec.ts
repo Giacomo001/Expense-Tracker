@@ -3,7 +3,7 @@ import { RegisterComponent } from './register.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth/auth.service';
 import { ToastService } from '@core/services/toast/toast.service';
-import { Router } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
 
@@ -13,6 +13,8 @@ describe("RegisterComponent", () => {
     // ================================================
     let component: RegisterComponent;
     let fixture: ComponentFixture<RegisterComponent>;
+    let router: Router;
+    let navigateByUrlSpy: jest.SpyInstance;
 
     let compAny: any;
 
@@ -26,21 +28,24 @@ describe("RegisterComponent", () => {
         error: jest.fn()
     };
 
-    const routerMock = {
-        navigateByUrl: jest.fn()
-    };
-
     beforeEach(async () => {
         jest.resetAllMocks();
 
         await TestBed.configureTestingModule({
             imports: [RegisterComponent, ReactiveFormsModule],
             providers: [
+                //Same rule as LoginComponent: provideRouter creates a REAL Router instance.
+                //Do NOT also override Router with a plain mock object — it breaks provideRouter's
+                //internal providers (they expect a real Router, not a flat { navigateByUrl } object).
+                //Spy on the real instance's method instead.
+                provideRouter([]),
                 { provide: AuthService, useValue: authServiceMock },
                 { provide: ToastService, useValue: toastServiceMock },
-                { provide: Router, useValue: routerMock }
             ]
         }).compileComponents();
+
+        router = TestBed.inject(Router);
+        navigateByUrlSpy = jest.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
 
         fixture = TestBed.createComponent(RegisterComponent);
         component = fixture.componentInstance;
@@ -49,10 +54,10 @@ describe("RegisterComponent", () => {
         fixture.detectChanges();
     });
 
-    //Form helper
+    //Form helper — registerForm is `protected`, so it must be accessed via compAny
     const fillForm = (values: { userName: string, email: string, password: string, confirmPassword: string }) => {
-        component.registerForm.patchValue(values);
-        component.registerForm.markAllAsTouched();
+        compAny.registerForm.patchValue(values);
+        compAny.registerForm.markAllAsTouched();
         fixture.detectChanges();
     };
 
@@ -68,41 +73,41 @@ describe("RegisterComponent", () => {
     // ================================================
     describe("registerForm Validator", () => {
         it("should be invalid when empty", () => {
-            expect(component.registerForm.valid).toBe(false);
+            expect(compAny.registerForm.valid).toBe(false);
         });
 
         it("should be valid with correct data", () => {
             fillForm(validPayload);
-            expect(component.registerForm.valid).toBe(true);
+            expect(compAny.registerForm.valid).toBe(true);
         });
 
         it("should flag userName as invalid when empty", () => {
-            //The spread operator allows to change only the specific parameter (userName in this case)
-            fillForm({...validPayload, userName: ''});
-            expect(component.registerForm.get('userName')?.hasError('required')).toBe(true);
+            fillForm({ ...validPayload, userName: '' });
+            expect(compAny.registerForm.get('userName')?.hasError('required')).toBe(true);
         });
 
         it("should flag email when format is incorrect", () => {
-            fillForm({...validPayload, email: 'test.test'});
-            expect(component.registerForm.get('email')?.hasError('email')).toBe(true);
+            fillForm({ ...validPayload, email: 'test.test' });
+            expect(compAny.registerForm.get('email')?.hasError('email')).toBe(true);
         });
 
         //Password tests
         it.each([
-            ['short1A', false], //Too short (less than 8 char)
-            ['alllowercase1', false], //No uppercase
-            ['ALLUPPERCASE1', false], //No lowercase
-            ['NoDigitsHere', false], //No digit
-            ['ValidPass1', true], //Meets all rules
+            ['short1A', false],        //too short (less than 8 char)
+            ['alllowercase1', false],  //no uppercase
+            ['ALLUPPERCASE1', false],  //no lowercase
+            ['NoDigitsHere', false],   //no digit
+            ['ValidPass1', true],      //meets all rules
         ])("password '%s' -> valid=%s", (password, expected) => {
-            fillForm({...validPayload, password, confirmPassword: password});
-            expect(component.registerForm.get('password')?.valid).toBe(expected);
+            fillForm({ ...validPayload, password, confirmPassword: password });
+            expect(compAny.registerForm.get('password')?.valid).toBe(expected);
         });
 
-        it("should flag password when exceeding MaximumLength", () => {
-            const longPass = 'A1a' + 'a'.repeat(126); //Repeats 'a' 126 times. Password is valid but of 129 characters
-            fillForm({...validPayload, password: longPass, confirmPassword: longPass});
-            expect(component.registerForm.get('password')?.hasError('maxLength')).toBe(true);
+        it("should flag password when exceeding maxLength", () => {
+            const longPass = 'A1a' + 'a'.repeat(126); //valid characters, but 129 chars total
+            fillForm({ ...validPayload, password: longPass, confirmPassword: longPass });
+            //NOTE: Angular's built-in validator key is lowercase 'maxlength', not 'maxLength'
+            expect(compAny.registerForm.get('password')?.hasError('maxlength')).toBe(true);
         });
     });
 
@@ -112,24 +117,22 @@ describe("RegisterComponent", () => {
     describe("matchValues (password/confirmPassword match)", () => {
         it("should mark confirmPassword invalid when values differ", () => {
             fillForm({ ...validPayload, password: 'Passw0rd', confirmPassword: 'Different1' });
-            expect(component.registerForm.get('confirmPassword')?.hasError('passwordMismatch')).toBe(true);
+            expect(compAny.registerForm.get('confirmPassword')?.hasError('passwordMismatch')).toBe(true);
         });
 
         it("should mark confirmPassword valid when values match", () => {
             fillForm({ ...validPayload, password: 'Passw0rd', confirmPassword: 'Passw0rd' });
-            expect(component.registerForm.get('confirmPassword')?.hasError('passwordMismatch')).toBe(false);
+            expect(compAny.registerForm.get('confirmPassword')?.hasError('passwordMismatch')).toBe(false);
         });
 
         it("should re-validate confirmPassword when password changes afterwards", () => {
-            //confirmPassword is filled first and matches the initial password
             fillForm({ ...validPayload, password: 'Passw0rd', confirmPassword: 'Passw0rd' });
-            expect(component.registerForm.get('confirmPassword')?.valid).toBe(true);
+            expect(compAny.registerForm.get('confirmPassword')?.valid).toBe(true);
 
-            //password changes -> confirmPassword must become invalid without being touched again
-            component.registerForm.get('password')?.setValue('NewPassw1');
+            compAny.registerForm.get('password')?.setValue('NewPassw1');
             fixture.detectChanges();
 
-            expect(component.registerForm.get('confirmPassword')?.hasError('passwordMismatch')).toBe(true);
+            expect(compAny.registerForm.get('confirmPassword')?.hasError('passwordMismatch')).toBe(true);
         });
     });
 
@@ -172,14 +175,16 @@ describe("RegisterComponent", () => {
             );
         });
 
-        it("should navigate to '/auth/login' and reset the form on successful registration", () => {
+        it("should navigate to '/auth/login' and reset the form on successful registration", async () => {
             toastServiceMock.loading.mockReturnValue(of({ id: 'user-1' }));
             fillForm(validPayload);
 
             compAny.register();
+            //navigateByUrl is awaited inside the subscribe callback, same pattern as LoginComponent
+            await Promise.resolve();
 
-            expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/auth/login');
-            expect(component.registerForm.value.email).toBeNull();
+            expect(navigateByUrlSpy).toHaveBeenCalledWith('/auth/login');
+            expect(compAny.registerForm.value.email).toBeFalsy();
         });
 
         it("should NOT navigate when registration fails", () => {
@@ -188,7 +193,7 @@ describe("RegisterComponent", () => {
 
             compAny.register();
 
-            expect(routerMock.navigateByUrl).not.toHaveBeenCalled();
+            expect(navigateByUrlSpy).not.toHaveBeenCalled();
         });
 
         it("should keep form values when registration fails", () => {
@@ -197,7 +202,7 @@ describe("RegisterComponent", () => {
 
             compAny.register();
 
-            expect(component.registerForm.value.email).toBe(validPayload.email);
+            expect(compAny.registerForm.value.email).toBe(validPayload.email);
         });
     });
 
@@ -205,55 +210,54 @@ describe("RegisterComponent", () => {
     // DOM
     // ================================================
     describe("template interactions", () => {
-    describe("submit button", () => {
-        const getSubmitBtn = () => fixture.debugElement.query(By.css('button[type="submit"]'));
+        describe("submit button", () => {
+            const getSubmitBtn = () => fixture.debugElement.query(By.css('button[type="submit"]'));
 
-        it("should be disabled when form is invalid", () => {
-            expect(getSubmitBtn().nativeElement.disabled).toBe(true);
+            it("should be disabled when form is invalid", () => {
+                expect(getSubmitBtn().nativeElement.disabled).toBe(true);
+            });
+
+            it("should be enabled when form is valid", () => {
+                fillForm(validPayload);
+                expect(getSubmitBtn().nativeElement.disabled).toBe(false);
+            });
         });
 
-        it("should be enabled when form is valid", () => {
-            fillForm(validPayload);
-            expect(getSubmitBtn().nativeElement.disabled).toBe(false);
+        describe("password visibility toggles", () => {
+            it("should default both password fields to type 'password'", () => {
+                const password = fixture.debugElement.query(By.css('input[formControlName="password"]'));
+                const confirmPassword = fixture.debugElement.query(By.css('input[formControlName="confirmPassword"]'));
+
+                expect(password.nativeElement.type).toBe('password');
+                expect(confirmPassword.nativeElement.type).toBe('password');
+            });
+
+            it("should toggle password field independently from confirmPassword", () => {
+                const toggleBtn = fixture.debugElement.query(By.css('[data-testid="toggle-password-visibility"]'));
+                toggleBtn.nativeElement.click();
+                fixture.detectChanges();
+
+                const password = fixture.debugElement.query(By.css('input[formControlName="password"]'));
+                const confirmPassword = fixture.debugElement.query(By.css('input[formControlName="confirmPassword"]'));
+
+                expect(password.nativeElement.type).toBe('text');
+                expect(confirmPassword.nativeElement.type).toBe('password'); //untouched by the other toggle
+            });
+
+            it("should toggle confirmPassword field independently from password", () => {
+                const toggleBtn = fixture.debugElement.query(By.css('[data-testid="toggle-confirm-password-visibility"]'));
+                toggleBtn.nativeElement.click();
+                fixture.detectChanges();
+
+                const password = fixture.debugElement.query(By.css('input[formControlName="password"]'));
+                const confirmPassword = fixture.debugElement.query(By.css('input[formControlName="confirmPassword"]'));
+
+                expect(password.nativeElement.type).toBe('password'); //untouched by the other toggle
+                expect(confirmPassword.nativeElement.type).toBe('text');
+            });
         });
-    });
 
-    describe("password visibility toggles", () => {
-        it("should default both password fields to type 'password'", () => {
-            const password = fixture.debugElement.query(By.css('input[formControlName="password"]'));
-            const confirmPassword = fixture.debugElement.query(By.css('input[formControlName="confirmPassword"]'));
-
-            expect(password.nativeElement.type).toBe('password');
-            expect(confirmPassword.nativeElement.type).toBe('password');
-        });
-
-        it("should toggle password field independently from confirmPassword", () => {
-            const toggleBtn = fixture.debugElement.query(By.css('[data-testid="toggle-password-visibility"]'));
-            toggleBtn.nativeElement.click();
-            fixture.detectChanges();
-
-            const password = fixture.debugElement.query(By.css('input[formControlName="password"]'));
-            const confirmPassword = fixture.debugElement.query(By.css('input[formControlName="confirmPassword"]'));
-
-            expect(password.nativeElement.type).toBe('text');
-            expect(confirmPassword.nativeElement.type).toBe('password'); //untouched by the other toggle
-        });
-
-        it("should toggle confirmPassword field independently from password", () => {
-            const toggleBtn = fixture.debugElement.query(By.css('[data-testid="toggle-confirm-password-visibility"]'));
-            toggleBtn.nativeElement.click();
-            fixture.detectChanges();
-
-            const password = fixture.debugElement.query(By.css('input[formControlName="password"]'));
-            const confirmPassword = fixture.debugElement.query(By.css('input[formControlName="confirmPassword"]'));
-
-            expect(password.nativeElement.type).toBe('password'); //untouched by the other toggle
-            expect(confirmPassword.nativeElement.type).toBe('text');
-        });
-    });
-
-    describe("validation error messages", () => 
-        {
+        describe("validation error messages", () => {
             //helper: finds an element whose own text content matches (not just contains, to avoid parent-match false positives)
             const findErrorText = (text: string) =>
                 fixture.debugElement.query(el => el.nativeElement.textContent?.trim() === text);

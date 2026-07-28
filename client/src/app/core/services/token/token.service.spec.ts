@@ -53,22 +53,19 @@ describe('TokenService', () => {
   // hasAccessToken
   // ================================================
   describe('hasAccessToken', () => {
-    it('should return false when both tokens are missing', () => {
-      expect(service.hasAccessToken()).toBe(false);
+    it('should return false when there is no access token', () => {
+        expect(service.hasAccessToken()).toBe(false);
     });
 
-    it('should return false when only accessToken is set', () => {
-      service.setAccessToken('mock-access-token');
-      expect(service.hasAccessToken()).toBe(false);
+    it('should return true when the access token is set', () => {
+        service.setAccessToken('mock-access-token');
+        expect(service.hasAccessToken()).toBe(true);
     });
 
-    it('should return false when only refreshToken is set', () => {
-      expect(service.hasAccessToken()).toBe(false);
-    });
-
-    it('should return true when both tokens are set', () => {
-      service.setAccessToken('mock-access-token');
-      expect(service.hasAccessToken()).toBe(true);
+    it('should return false again after the token is cleared', () => {
+        service.setAccessToken('mock-access-token');
+        service.clearAccessToken();
+        expect(service.hasAccessToken()).toBe(false);
     });
   });
 });

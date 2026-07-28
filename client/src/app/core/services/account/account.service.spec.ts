@@ -10,7 +10,6 @@ describe('AccountService', () => {
   let routerMock: jest.Mocked<Router>;
   let tokenServiceMock: jest.Mocked<TokenService>;
 
-  //Outside the 'describe' since it will never change
   const mockUser: LoggedUser = {
     userName: "UserTest",
     email: "test@test.test"
@@ -24,7 +23,7 @@ describe('AccountService', () => {
     } as unknown as jest.Mocked<Router>;
 
     tokenServiceMock = {
-      clearTokens: jest.fn()
+      clearAccessToken: jest.fn()
     } as unknown as jest.Mocked<TokenService>;
 
     TestBed.configureTestingModule({
@@ -40,15 +39,12 @@ describe('AccountService', () => {
 
   describe("LoadFromStorage", () => {
     it("should return null when sessionStorage is empty", () => {
-      //Since 'beforeEach' clears the sessionStorage, there is no need for the Arrange or Act part
       expect(service.loggedUser()).toBeNull();
     });
 
     it("should return the parsed LoggedUser when sessionStorage has data", () => {
-      //Arrange
       sessionStorage.setItem('user', JSON.stringify(mockUser));
 
-      //Recreates the TestBed AFTER the sessionStorage has been initialized
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         providers: [
@@ -56,21 +52,18 @@ describe('AccountService', () => {
           { provide: Router, useValue: routerMock },
           { provide: TokenService, useValue: tokenServiceMock }
         ]
-      });     
+      });
 
       const freshService = TestBed.inject(AccountService);
-      
-      //Act + Assert
+
       expect(freshService.loggedUser()).toEqual(mockUser);
     });
   });
 
   describe("SetLoggedUser", () => {
     it("should store the user in the sessionStorage", () => {
-      //Set the user
       service.setLoggedUser(mockUser);
 
-      //Check if the user was stored correctly
       const storedUser = JSON.parse(sessionStorage.getItem('user')!);
       expect(storedUser).toEqual(mockUser);
     });
@@ -83,10 +76,8 @@ describe('AccountService', () => {
 
   describe("RemoveLocalData", () => {
     it("should remove the data from SessionStorage", () => {
-      //Set the item in the SessionStorage
       sessionStorage.setItem('user', JSON.stringify(mockUser));
 
-      //Removes it
       service.removeLocalData();
       expect(service.loggedUser()).toBeNull();
     });
@@ -95,6 +86,11 @@ describe('AccountService', () => {
       service.setLoggedUser(mockUser);
       service.removeLocalData();
       expect(service.loggedUser()).toBeNull();
+    });
+
+    it("should call tokenService.clearAccessToken()", () => {
+      service.removeLocalData();
+      expect(tokenServiceMock.clearAccessToken).toHaveBeenCalled();
     });
   });
 
@@ -105,9 +101,9 @@ describe('AccountService', () => {
       expect(sessionStorage.getItem('user')).toBeNull();
     });
 
-    it("should call tokenService.clearTokens()", () => {
+    it("should call tokenService.clearAccessToken()", () => {
       service.logout();
-      expect(tokenServiceMock.clearTokens).toHaveBeenCalled();
+      expect(tokenServiceMock.clearAccessToken).toHaveBeenCalled();
     });
 
     it("should navigate to the login page", () => {

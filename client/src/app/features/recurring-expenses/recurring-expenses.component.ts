@@ -40,8 +40,6 @@ export class RecurringExpensesComponent {
   protected recurringExpensesSorted = computed(() => {
     const categoryId = this.selectedCategoryId();
 
-    console.log(categoryId);
-
     //Ordering the lists from the closest to the current date to the furthest from it
     return [...this.recExpensesList()]
     .filter(r => categoryId ? r.categoryId === categoryId : true) //Category filter

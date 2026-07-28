@@ -18,10 +18,8 @@ describe('AuthService', () => {
 
   const baseUrl = `${environment.apiUrl}/auth`;
 
-  //Reusable mock data
   const mockAuthResponse: AuthResponse = {
     accessToken: 'mock-access-token',
-    refreshToken: 'mock-refresh-token',
     userName: 'mock-username',
     email: 'mock-email'
   };
@@ -32,10 +30,12 @@ describe('AuthService', () => {
   }
 
   beforeEach(() => {
+    //No refresh token handling on the client anymore — the refresh token lives in an httpOnly cookie sent automatically via withCredentials.
     tokenServiceMock = {
       setAccessToken: jest.fn(),
-      setRefreshToken: jest.fn(),
-      getRefreshToken: jest.fn().mockReturnValue('mock-refresh-token')
+      clearAccessToken: jest.fn(),
+      hasAccessToken: jest.fn(),
+      getAccessToken: jest.fn()
     } as unknown as jest.Mocked<TokenService>;
 
     accountServiceMock = {
@@ -52,7 +52,7 @@ describe('AuthService', () => {
           { provide: AccountService, useValue: accountServiceMock }
         ]
       });
-  
+
       service = TestBed.inject(AuthService);
       httpMock = TestBed.inject(HttpTestingController);
   });
@@ -63,140 +63,129 @@ describe('AuthService', () => {
 
   describe("Registration", () => {
     it("should send a POST request with the correct body and return AuthResponse", () => {
-      //Arrange
       const mockRegisterRequest: RegisterRequest = {
         userName: 'Test',
         email: 'test@test.test',
         password: 'Password test',
         confirmPassword: 'Password test'
       }
-      
-      //Act
+
       service.registration(mockRegisterRequest).subscribe(res => {
         expect(res).toEqual(mockAuthResponse);
       });
-      
-      //Assert
+
       const req = httpMock.expectOne(`${baseUrl}/register`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockRegisterRequest);
-      
-      //Simulate
+      expect(req.request.withCredentials).toBe(true);
+
       req.flush(mockAuthResponse);
     });
 
-    //Takes care of the 'tap()'
-    it("should save tokens and logged user after a successful registration", () => {
-      //Arrange
+    it("should save the access token and logged user after a successful registration", () => {
       const mockRegisterRequest: RegisterRequest = {
         userName: 'Test',
         email: 'test@test.test',
         password: 'Password test',
         confirmPassword: 'Password test'
       }
-      
-      //Act
+
       service.registration(mockRegisterRequest).subscribe();
       httpMock.expectOne(`${baseUrl}/register`).flush(mockAuthResponse);
-      
-      //Assert
-      //Since handleAuthResponse is a private method, only its side effects can be checked
+
+      //The refresh token is set as an httpOnly cookie by the backend — the client never touches it directly, so only the access token save is asserted here.
       expect(tokenServiceMock.setAccessToken).toHaveBeenCalledWith(mockAuthResponse.accessToken);
-      expect(tokenServiceMock.setRefreshToken).toHaveBeenCalledWith(mockAuthResponse.refreshToken);
-      expect(accountServiceMock.setLoggedUser).toHaveBeenCalledWith(mockLoggedUser);      
+      expect(accountServiceMock.setLoggedUser).toHaveBeenCalledWith(mockLoggedUser);
     });
   });
 
   describe("Login", () => {
     it("should send a POST request with the correct body and return AuthResponse", () => {
-      //Arrange
       const mockLoginRequest: LoginRequest = {
         email: 'test@test.test',
         password: 'Password test'
       };
-      
-      //Act
+
       service.login(mockLoginRequest).subscribe(res => {
         expect(res).toEqual(mockAuthResponse);
       });
-      
-      //Assert
+
       const req = httpMock.expectOne(`${baseUrl}/login`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockLoginRequest);
-      
-      //Simulate
+      expect(req.request.withCredentials).toBe(true);
+
       req.flush(mockAuthResponse);
     });
 
-    it("should save tokens and logged user after a successful login", () => {
-      //Arrange
+    it("should save the access token and logged user after a successful login", () => {
       const mockLoginRequest: LoginRequest = {
         email: 'test@test.test',
         password: 'Password test'
       };
-      
-      //Act
+
       service.login(mockLoginRequest).subscribe();
       httpMock.expectOne(`${baseUrl}/login`).flush(mockAuthResponse);
-      
-      //Assert
+
       expect(tokenServiceMock.setAccessToken).toHaveBeenCalledWith(mockAuthResponse.accessToken);
-      expect(tokenServiceMock.setRefreshToken).toHaveBeenCalledWith(mockAuthResponse.refreshToken);
       expect(accountServiceMock.setLoggedUser).toHaveBeenCalledWith(mockLoggedUser);
     });
   });
 
   describe("Refresh", () => {
-    it("should call a POST method with the correct body and return AuthResponse", () => {
-      //Arrange
-      //GetRefreshToken is mocked already
-      
-      //Act
+    it("should call POST with an empty body, relying on the httpOnly cookie", () => {
       service.refresh().subscribe(res => {
         expect(res).toEqual(mockAuthResponse);
       });
-      
-      //Assert
+
       const req = httpMock.expectOne(`${baseUrl}/refresh`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ refreshToken: 'mock-refresh-token' })
-      
-      //Simulate
+      expect(req.request.body).toEqual({});
+      expect(req.request.withCredentials).toBe(true); //cookie is sent automatically
+
       req.flush(mockAuthResponse);
     });
 
-    it("should save tokens and logged user after a successful token refresh", () => {
-      //Arrange
-
-      //Act
+    it("should save the access token and logged user after a successful refresh", () => {
       service.refresh().subscribe();
       httpMock.expectOne(`${baseUrl}/refresh`).flush(mockAuthResponse);
-      
-      //Assert
-      expect(tokenServiceMock.getRefreshToken).toHaveBeenCalled();
+
       expect(tokenServiceMock.setAccessToken).toHaveBeenCalledWith(mockAuthResponse.accessToken);
-      expect(tokenServiceMock.setRefreshToken).toHaveBeenCalledWith(mockAuthResponse.refreshToken);
       expect(accountServiceMock.setLoggedUser).toHaveBeenCalledWith(mockLoggedUser);
     });
   });
 
   describe("Revoke", () => {
-    it("should send a POST request with the correct body and remove data from sessionStorage and signal", () => {
-      //Act
+    it("should send a POST request with an empty body", () => {
       service.revoke().subscribe();
-      
-      //Assert
+
       const req = httpMock.expectOne(`${baseUrl}/revoke`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ refreshToken: 'mock-refresh-token' });
-      
-      //Simulate
+      expect(req.request.body).toEqual({});
+      expect(req.request.withCredentials).toBe(true);
+
       req.flush(null);
 
-      //Side Effects
-      expect(tokenServiceMock.getRefreshToken).toHaveBeenCalled();
       expect(accountServiceMock.logout).toHaveBeenCalled();
+    });
+
+    it("should call accountService.logout() even when the request fails", () => {
+      service.revoke().subscribe({ error: () => {} });
+
+      const req = httpMock.expectOne(`${baseUrl}/revoke`);
+      req.flush('server error', { status: 500, statusText: 'Internal Server Error' });
+
+      //Covers the catchError branch — logout must still happen on failure
+      expect(accountServiceMock.logout).toHaveBeenCalled();
+    });
+  });
+
+  describe("logoutLocally", () => {
+    it("should call accountService.logout() without any HTTP call", () => {
+      service.logoutLocally();
+
+      expect(accountServiceMock.logout).toHaveBeenCalled();
+      httpMock.verify(); //No pending requests — confirms no HTTP call was made
     });
   });
 });

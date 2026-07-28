@@ -114,7 +114,7 @@ export class ReportChartComponent {
   private annualChartData = computed<ChartData<'bar'>>(() => {
     const year = this.appStateService.viewYear();
     const expenses = this.appStateService.expensesList();
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dic'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
     const data = Array.from({ length: 12 }, (_, i) =>
       expenses
