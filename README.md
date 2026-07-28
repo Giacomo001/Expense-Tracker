@@ -9,7 +9,7 @@ A full-stack personal finance management application built with **.NET 10** and 
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 [![Last Commit](https://img.shields.io/github/last-commit/Giacomo001/expense-tracker)]()
 
-> ⚠️ This project is currently under active development. Backend and frontend implementation are complete — currently in testing phase.
+> ⚠️ This project is currently under active development. Backend and frontend implementation are complete — testing phase in progress on both layers.
 
 ---
 
@@ -67,9 +67,11 @@ flowchart TD
 ### Testing
 | Technology | Purpose |
 |---|---|
-| xUnit v3 | Test framework |
-| NSubstitute | Mocking |
-| FluentAssertions | Assertions |
+| xUnit v3 | Backend test framework |
+| NSubstitute | Backend mocking |
+| FluentAssertions | Backend assertions |
+| Jest | Frontend test framework |
+| Angular Testing Library / TestBed | Frontend component testing |
 
 ---
 
@@ -157,11 +159,20 @@ The API will be available at `http://localhost:8080`, the frontend at `http://lo
 
 ## Running Tests
 
+### Backend
 ```bash
 dotnet test
 ```
 
 Current coverage: **27 unit tests** across Commands, Queries, and Report aggregations.
+
+### Frontend
+```bash
+cd client
+npm test
+```
+
+Current coverage: **381 tests** across components, dialogs, services, pipes, and utilities.
 
 ---
 
@@ -194,9 +205,10 @@ The solution is split by Clean Architecture layer:
 
 - [x] Backend — Clean Architecture + CQRS
 - [x] Authentication with JWT + Refresh Token
-- [x] Unit Tests
+- [x] Backend Unit Tests
 - [x] Frontend — Angular
-- [ ] Integration Tests
+- [x] Frontend Unit Tests
+- [x] Integration Tests
 
 ---
 
