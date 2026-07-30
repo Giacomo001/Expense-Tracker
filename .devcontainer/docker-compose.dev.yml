@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api:
     build:
@@ -16,8 +14,9 @@ services:
       - api_bin:/workspace/ExpenseTracker.API/bin
       - api_obj:/workspace/ExpenseTracker.API/obj
       - client_node_modules:/workspace/client/node_modules
+      - nuget_packages:/home/developer/.nuget/packages
       - ~/.gitconfig:/home/developer/.gitconfig:ro
-      - ~/.ssh:/home/developer/.ssh:ro
+      - ~/.ssh:/home/developer/.ssh
     ports:
       - "8080:8080"
     depends_on:
@@ -55,3 +54,4 @@ volumes:
   api_bin:
   api_obj:
   client_node_modules:
+  nuget_packages:
