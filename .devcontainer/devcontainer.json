@@ -41,8 +41,7 @@
     "ssh-config": "mkdir -p /home/developer/.ssh && echo -e 'Host *\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_ed25519' > /home/developer/.ssh/config && chmod 600 /home/developer/.ssh/config",
     "dotnet-restore": "sudo chown -R developer:developer /home/developer/.nuget/packages && dotnet restore /workspace/ExpenseTracker.slnx",
     "npm-install": "cd /workspace/client && npm ci --legacy-peer-deps",
-    "npm-audit": "cd /workspace/client && npm audit --audit-level=high || true",
-    "postgres-client": "sudo apt-get update && sudo apt-get install -y --no-install-recommends postgresql-client"
+    "npm-audit": "cd /workspace/client && npm audit --audit-level=high || true"
   },
 
   "forwardPorts": [8080, 4200, 5432],
