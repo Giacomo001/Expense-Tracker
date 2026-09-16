@@ -27,5 +27,3 @@ client/.angular/cache/
 .DS_Store
 Thumbs.db
 ExpenseTracker.API/appsettings.json
-client/src/environments/environment.development.ts
-client/src/environments/environment.ts
