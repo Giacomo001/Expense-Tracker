@@ -44,7 +44,7 @@
     "npm-audit": "cd /workspace/client && npm audit --audit-level=high || true"
   },
 
-  "forwardPorts": [8080, 4200, 5432],
+  "forwardPorts": [5432],
   "portsAttributes": {
     "8080": { "label": "API" },
     "4200": { "label": "Angular" },

@@ -12,8 +12,14 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
+      /* 
+        Skip refresh logic entirely for the refresh endpoint itself otherwise a 401 on /auth/refresh re-triggers refresh(), 
+        which makes another request through this same interceptor, looping forever.
+      */
+      const isRefreshRequest = req.url.includes('/auth/refresh');
+
       //If 401 and a refresh token exists, attempt to refresh the access token
-      if(error.status === 401) {
+      if(error.status === 401 && !isRefreshRequest) {
         return authService.refresh().pipe(
           switchMap(() => {
             //Retry the original request with the new access token
@@ -21,9 +27,9 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
             return next(retryReq);
           }),
           catchError(refreshError => {
-            //Refresh failed — session is expired, logout the user
+            //Refresh failed; session is expired; logout the user
             tokenService.clearAccessToken();
-            authService['accountService'].logout();
+            authService.logoutLocally();
             return throwError(() => refreshError);
           })
         );

@@ -19,6 +19,7 @@ services:
       - ~/.ssh:/home/developer/.ssh
     ports:
       - "8080:8080"
+      - "4200:4200"
     depends_on:
       db:
         condition: service_healthy
