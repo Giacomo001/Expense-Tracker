@@ -34,8 +34,8 @@
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "Re-optimizing dependencies",
-          "endsPattern": "Local:\\s+http://localhost:4200"
+          "beginsPattern": ".*",
+          "endsPattern": "Local:.*4200"
         }
       }
     }

@@ -26,6 +26,9 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
+//TEST
+Console.WriteLine($"[DEBUG] ConnectionString: '{builder.Configuration.GetConnectionString("DefaultConnection")}'");
+
 app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
