@@ -38,7 +38,8 @@
   },
 
   "postCreateCommand": {
-    "ssh-config": "mkdir -p /home/developer/.ssh && echo -e 'Host *\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_ed25519' > /home/developer/.ssh/config && chmod 600 /home/developer/.ssh/config",
+    //"ssh-config": "mkdir -p /home/developer/.ssh && echo -e 'Host *\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_ed25519' > /home/developer/.ssh/config && chmod 600 /home/developer/.ssh/config",
+    "ssh-config": "mkdir -p /home/developer/.ssh && printf 'Host *\\n  AddKeysToAgent yes\\n  IdentityFile ~/.ssh/id_ed25519\\n' > /home/developer/.ssh/config && chmod 600 /home/developer/.ssh/config",
     "dotnet-restore": "sudo chown -R developer:developer /home/developer/.nuget/packages && dotnet restore /workspace/ExpenseTracker.slnx",
     "npm-install": "cd /workspace/client && npm ci --legacy-peer-deps",
     "npm-audit": "cd /workspace/client && npm audit --audit-level=high || true"
