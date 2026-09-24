@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApi(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApiRateLimiting();
 
 builder.Services.AddCors(options =>
 {
@@ -26,9 +27,6 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
-//TEST
-Console.WriteLine($"[DEBUG] ConnectionString: '{builder.Configuration.GetConnectionString("DefaultConnection")}'");
-
 app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
@@ -43,6 +41,9 @@ app.UseCors("DevelopmentPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+//API Limiter
+app.UseRateLimiter();
 
 app.MapControllers();
 
