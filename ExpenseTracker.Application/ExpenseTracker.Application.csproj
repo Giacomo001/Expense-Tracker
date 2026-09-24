@@ -15,6 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features/Auth/" />
+    <Folder Include="Features/Auth/Commands/" />
+    <Folder Include="Features/Auth/Queries/" />
     <Folder Include="Features/RecurringExpenses/Commands/" />
   </ItemGroup>
 
