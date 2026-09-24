@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 using ErrorOr;
@@ -10,6 +8,7 @@ using ExpenseTracker.Domain.Entities;
 using ExpenseTracker.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 
 namespace ExpenseTracker.Infrastructure.Services;
@@ -123,6 +122,57 @@ public class AuthService(
         }
 
         return Result.Deleted;    
+    }
+
+    public async Task<string?> GeneratePasswordResetLinkAsync(ForgotPasswordDto dto, CancellationToken token = default)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+
+        if(user is null)
+        {
+            return null;
+        }
+
+        var rawToken = await userManager.GeneratePasswordResetTokenAsync(user);
+        //Trasforms the rawToken in a Base64 URL-Safe string (avoids problematic special characters such as '+', '/' or '=')
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
+
+        var frontendBaseUrl = config["Frontend:BaseUrl"] ?? 
+            throw new InvalidOperationException("Frontend:BaseUrl is not configured");
+
+        return $"{frontendBaseUrl}/auth/reset-password?token={encodedToken}&email={Uri.EscapeDataString(user.Email!)}";
+    }
+
+    public async Task<ErrorOr<Success>> ResetPasswordAsync(ResetPasswordDto dto, CancellationToken token = default)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+
+        if(user is null)
+        {
+            return Error.Validation("ResetPassword.InvalidToken", "Invalid or expired token.");
+        }
+
+        //Token part
+        string decodedToken;
+
+        try
+        {
+            decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dto.Token));
+        } 
+        catch(FormatException)
+        {
+            return Error.Validation("ResetPassword.InvalidToken", "Invalid or expired token.");
+        }
+
+        var result = await userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            var errorMessage = result.Errors.FirstOrDefault()?.Description ?? "Invalid or expired token.";
+            return Error.Validation("ResetPassword.Failed", errorMessage);
+        }
+
+        return Result.Success;
     }
 
     //PRIVATE METHODS
