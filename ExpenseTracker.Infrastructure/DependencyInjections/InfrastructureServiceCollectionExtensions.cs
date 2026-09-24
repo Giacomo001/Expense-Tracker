@@ -19,7 +19,7 @@ public static class InfrastructureServiceCollectionExtensions
     {
         services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-        object value = services.AddIdentityCore<User>(opt =>
+        services.AddIdentityCore<User>(opt =>
         {
             //Password
             opt.Password.RequireDigit = true;
@@ -40,7 +40,26 @@ public static class InfrastructureServiceCollectionExtensions
         .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders()
+        .AddTokenProvider<DataProtectorTokenProvider<User>>("PasswordReset")
         .AddSignInManager();
+
+        //Password Reset Token
+        services.Configure<DataProtectionTokenProviderOptions>("PasswordReset", opt =>
+        {
+            opt.TokenLifespan = TimeSpan.FromHours(1);
+        });
+
+        //Tells Identity to use "PasswordReset" as the default provider for every reset password operations (Generate + Verify/Reset)
+        services.Configure<IdentityOptions>(opt =>
+        {
+            opt.Tokens.PasswordResetTokenProvider = "PasswordReset";
+        });
+
+        //Email
+        services.AddOptions<EmailSettings>()
+            .Bind(configuration.GetSection(EmailSettings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart(); //The software doesn't start if Host or Username are missing
 
         //UnitOfWork
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -53,6 +72,7 @@ public static class InfrastructureServiceCollectionExtensions
 
         //Services Injection
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IReportGeneratorService, ReportGeneratorService>();   
 
