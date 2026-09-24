@@ -1,15 +1,20 @@
+using ExpenseTracker.API.DependencyInjections;
 using ExpenseTracker.Application.DTOs;
+using ExpenseTracker.Application.Features.Auth.Commands;
 using ExpenseTracker.Application.Interfaces.Services;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ExpenseTracker.API.Controllers;
 
-public class AuthController(IAuthService authService, IConfiguration config) : BaseApiController
+public class AuthController(IAuthService authService, IConfiguration config, IMediator mediator) : BaseApiController
 {
     private const string RefreshTokenCookieName = "refreshToken";
     private const string RefreshTokenCookiePath = "/api/auth";
 
     [HttpPost("register")]
+    [EnableRateLimiting(RateLimitingServiceCollectionExtensions.RegisterPolicy)]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto, CancellationToken token)
     {
         var result = await authService.RegisterAsync(dto, token);
@@ -21,12 +26,32 @@ public class AuthController(IAuthService authService, IConfiguration config) : B
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting(RateLimitingServiceCollectionExtensions.LoginPolicy)]
     public async Task<IActionResult> Login([FromBody] LoginDto dto, CancellationToken token)
     {
         var result = await authService.LoginAsync(dto, token);
 
         return result.Match(
             authResponse => Ok(BuildClientResponse(authResponse)),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPost("forgot-password")]
+    [EnableRateLimiting(RateLimitingServiceCollectionExtensions.ForgotPasswordPolicy)]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto, CancellationToken cancellationToken)
+    {
+        await mediator.Send(new ForgotPasswordCommand(dto), cancellationToken);
+        //Returns Ok for security reasons
+        return Ok();
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto, CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new ResetPasswordCommand(dto), cancellationToken);
+        return result.Match(
+            _ => Ok(),
             errors => Problem(errors)
         );
     }
