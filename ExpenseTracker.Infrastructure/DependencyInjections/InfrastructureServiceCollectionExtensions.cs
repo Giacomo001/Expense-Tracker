@@ -9,6 +9,7 @@ using ExpenseTracker.Application.Interfaces.Repositories;
 using ExpenseTracker.Infrastructure.Persistence.Repositories;
 using ExpenseTracker.Application.Interfaces.Services;
 using ExpenseTracker.Infrastructure.Services;
+using ExpenseTracker.Infrastructure.Services.Email;
 
 namespace ExpenseTracker.Infrastructure.DependencyInjections;
 
