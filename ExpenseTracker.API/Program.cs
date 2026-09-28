@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApi(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApiRateLimiting();
+builder.Services.AddApiRateLimiting(builder.Environment);
 
 builder.Services.AddCors(options =>
 {
