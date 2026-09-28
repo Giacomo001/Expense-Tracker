@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RegisterSecurityPanelComponent } from "@shared/components/register-security-panel/register-security-panel.component";
+import { strictEmailValidator } from '@shared/validators/email.validators';
 
 @Component({
   selector: 'app-register',
@@ -49,7 +50,7 @@ export class RegisterComponent implements OnInit {
   private initializeForm() {
     this.registerForm = this.fb.group({
       userName: ['', Validators.required],
-      email: ['', [Validators.email, Validators.required]],
+      email: ['', [Validators.required, strictEmailValidator()]],
       password: [
         '',
         [

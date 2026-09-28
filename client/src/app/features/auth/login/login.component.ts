@@ -10,6 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { ChartData, ChartOptions, Chart, ArcElement, Tooltip, DoughnutController } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { AuthChartsComponent } from "@shared/components/charts/auth-charts/auth-charts.component";
+import { MatDialog } from '@angular/material/dialog';
+import { ForgotPasswordDialogComponent } from '@features/forgot-password/forgot-password-dialog/forgot-password-dialog.component';
+import { strictEmailValidator } from '@shared/validators/email.validators';
 
 @Component({
   selector: 'app-login',
@@ -54,7 +57,7 @@ export class LoginComponent implements OnInit {
   // ============================================================
   private initializeForm() {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.email, Validators.required]],
+      email: ['', [Validators.required, strictEmailValidator()]],
       password: ['', [Validators.required]]
     });
   }
