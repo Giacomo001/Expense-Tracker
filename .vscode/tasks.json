@@ -38,6 +38,16 @@
           "endsPattern": "Local:.*4200"
         }
       }
+    },
+    {
+      "label": "kill-ng-serve",
+      "type": "shell",
+      "command": "pkill -f 'ng serve' || true",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
     }
   ]
 }

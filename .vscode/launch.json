@@ -21,6 +21,7 @@
       "type": "chrome",
       "request": "launch",
       "preLaunchTask": "ng serve",
+      "postDebugTask": "kill-ng-serve",
       "url": "http://localhost:4200",
       "webRoot": "${workspaceFolder}/client",
       "sourceMaps": true,
@@ -28,12 +29,32 @@
       "sourceMapPathOverrides": {
         "/workspace/client/*": "${workspaceFolder}/client/*"
       }
+    },
+    {
+      "name": "Angular Frontend (Chrome - Incognito)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "ng serve",
+      "postDebugTask": "kill-ng-serve",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/client",
+      "sourceMaps": true,
+      "pauseForSourceMap": true,
+      "sourceMapPathOverrides": {
+        "/workspace/client/*": "${workspaceFolder}/client/*"
+      },
+      "runtimeArgs": ["--incognito"]
     }
   ],
   "compounds": [
     {
       "name": "Full Stack Debug",
       "configurations": ["C# Backend", "Angular Frontend (Chrome)"],
+      "stopAll": true
+    },
+    {
+      "name": "Full Stack Debug (Incognito)",
+      "configurations": ["C# Backend", "Angular Frontend (Chrome - Incognito)"],
       "stopAll": true
     }
   ]
