@@ -9,3 +9,15 @@ export interface RegisterRequest {
     password: string;
     confirmPassword: string;
 }
+
+//Forgot Password
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ResetPasswordRequest {
+    token: string;
+    email: string;
+    newPassword: string;
+    confirmPassword: string;
+}
