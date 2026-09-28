@@ -28,6 +28,8 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+
+  private dialog = inject(MatDialog);
   
   // ============================================================
   // PROPERTIES
@@ -78,5 +80,9 @@ export class LoginComponent implements OnInit {
         this.loginForm.reset();
       }
     });
+  }
+
+  protected openForgotPasswordDialog() {
+    this.dialog.open(ForgotPasswordDialogComponent);
   }
 }
