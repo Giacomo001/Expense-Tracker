@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { AccountService } from '../account/account.service';
 import { TokenService } from '../token/token.service';
-import { LoginRequest, RegisterRequest } from '@features/auth/models/auth-request.model';
+import { ForgotPasswordRequest, LoginRequest, RegisterRequest, ResetPasswordRequest } from '@features/auth/models/auth-request.model';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { AuthResponse } from '@features/auth/models/auth-response.model';
 import { LoggedUser } from '@features/auth/models/logged-user.model';
@@ -46,6 +46,21 @@ export class AuthService {
     );
   }
 
+  logoutLocally(): void {
+    //Local clean-up without a HTTP call. Used by the Interceptor when refresh does not work
+    this.accountService.logout();
+  }
+
+  //Reset Password Methods
+  forgotPassword(request: ForgotPasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/auth/forgot-password`, request);
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/auth/reset-password`, request);
+  }
+
+  //Private Methods
   private handleAuthResponse(response: AuthResponse) {
     //The RefreshToken is already saved as cookie HttpOnly in the response
     this.tokenService.setAccessToken(response.accessToken);
@@ -56,10 +71,5 @@ export class AuthService {
       email: response.email
     };
     this.accountService.setLoggedUser(user);
-  }
-
-  logoutLocally(): void {
-    //Local clean-up without a HTTP call. Used by the Interceptor when refresh does not work
-    this.accountService.logout();
   }
 }
