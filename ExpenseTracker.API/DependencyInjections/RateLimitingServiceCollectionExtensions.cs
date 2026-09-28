@@ -9,7 +9,7 @@ public static class RateLimitingServiceCollectionExtensions
     public const string RegisterPolicy = "register";
     public const string ForgotPasswordPolicy = "forgot-password";
 
-    public static IServiceCollection AddApiRateLimiting(this IServiceCollection services)
+    public static IServiceCollection AddApiRateLimiting(this IServiceCollection services, IWebHostEnvironment env)
     {
         services.AddRateLimiter(opt =>
         {
@@ -30,16 +30,21 @@ public static class RateLimitingServiceCollectionExtensions
                 }, cancellationToken);
             };
 
+            var globalLimit = env.IsDevelopment() ? 10_000 : 300;
+
             //Global fallback: protect the entire API from a generic flood
             opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
             {
                 var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
+                // TEMPORANEO — rimuovere dopo il debug
+                Console.WriteLine($"[RateLimit] {DateTime.UtcNow:HH:mm:ss.fff} | IP: {partitionKey} | Path: {httpContext.Request.Path}");
+
                 return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
                 {
-                   PermitLimit = 5,
-                   Window = TimeSpan.FromMinutes(5),
-                   QueueLimit = 0 
+                    PermitLimit = globalLimit,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
                 });
             });
 
