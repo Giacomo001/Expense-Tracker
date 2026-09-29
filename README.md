@@ -9,7 +9,7 @@ A full-stack personal finance management application built with **.NET 10** and 
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 [![Last Commit](https://img.shields.io/github/last-commit/Giacomo001/expense-tracker)]()
 
-> ⚠️ This project is currently under active development. Backend and frontend implementation are complete — testing phase in progress on both layers.
+> ⚠️ This is a personal learning/portfolio project, currently under active development. Not intended for production use. Backend and frontend implementation are complete — testing phase in progress on both layers.
 
 ---
 
@@ -28,7 +28,7 @@ flowchart TD
     INFRA --> APP
 ```
 
-`ExpenseTracker.API` exposes REST controllers and depends only on `Application`, which holds the use cases — implemented as CQRS commands and queries via MediatR — and defines the repository interfaces without knowing how they're implemented. `ExpenseTracker.Infrastructure` implements those interfaces (EF Core, PostgreSQL, ASP.NET Core Identity, JWT/refresh token handling) and depends on `Application`, never the other way around. `ExpenseTracker.Domain` sits at the core with zero external dependencies — just entities and business rules.
+`ExpenseTracker.API` exposes REST controllers and depends only on `Application`, which holds the use cases — implemented as CQRS commands and queries via MediatR — and defines the repository interfaces without knowing how they're implemented. `ExpenseTracker.Infrastructure` implements those interfaces (EF Core, PostgreSQL, ASP.NET Core Identity, JWT/refresh token handling, MailKit) and depends on `Application`, never the other way around. `ExpenseTracker.Domain` sits at the core with zero external dependencies — just entities and business rules.
 
 ---
 
@@ -41,11 +41,12 @@ flowchart TD
 | ASP.NET Core Web API | REST API |
 | Entity Framework Core 9 | ORM |
 | PostgreSQL 16 | Database |
-| ASP.NET Core Identity | User management |
+| ASP.NET Core Identity | User management, password reset tokens |
 | MediatR | CQRS pattern |
 | FluentValidation | Input validation |
 | ErrorOr | Result pattern |
 | JWT + Refresh Token | Authentication |
+| MailKit | Transactional email (password reset) |
 
 ### Frontend
 | Technology | Purpose |
@@ -63,6 +64,7 @@ flowchart TD
 | Docker + Docker Compose | Containerization |
 | VS Code Dev Containers | Development environment |
 | Adminer | Database GUI |
+| Mailpit | Local SMTP catcher for email testing |
 
 ### Testing
 | Technology | Purpose |
@@ -70,6 +72,7 @@ flowchart TD
 | xUnit v3 | Backend test framework |
 | NSubstitute | Backend mocking |
 | FluentAssertions | Backend assertions |
+| FluentValidation.TestHelper | Backend validator testing |
 | Jest | Frontend test framework |
 | Angular Testing Library / TestBed | Frontend component testing |
 
@@ -83,6 +86,7 @@ flowchart TD
 - Refresh token rotation with SHA-256 hashing and reuse detection
 - CSRF protection via double-submit cookie pattern (antiforgery token)
 - Token revocation (logout)
+- Password recovery via emailed reset link, using a dedicated ASP.NET Identity token provider (1-hour expiry, single use). Rate-limited and designed to never reveal whether an email is registered (anti-enumeration)
 - NIST-compliant password policy
 - Account lockout after failed attempts
 
@@ -128,32 +132,50 @@ POSTGRES_DB=your_postgres_db
 **.env.container**
 ```env
 ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=YOUR_DB;Username=YOUR_USERNAME;Password=YOUR_PASSWORD
+
 Jwt__Key=YOUR_SECRET_KEY_MIN_32_CHARS
 Jwt__Issuer=ExpenseTrackerAPI
 Jwt__Audience=ExpenseTrackerClient
 Jwt__ExpiresInMinutes=60
 Jwt__RefreshTokenExpirationDays=7
+
+Frontend__BaseUrl=http://localhost:4200
+
+# Local email testing via Mailpit (no real credentials needed, see step 4 below)
+Email__Host=mailpit
+Email__Port=1025
+Email__Username=
+Email__Password=
+Email__FromEmail=noreply@expensetracker.local
+Email__FromName=Expense Tracker
+Email__UseSsl=false
 ```
 
 3. Open the project in VS Code and select **Reopen in Container** when prompted.
 
-4. Run the database migrations:
+4. Mailpit (local SMTP catcher) starts automatically with Docker Compose. Password reset emails are captured there instead of being sent for real — view them at `http://localhost:8025`.
+
+5. Run the database migrations:
 ```bash
 make migrate name=InitialCreate
 make update
 ```
 
-5. Start the API:
+6. Start the API:
 ```bash
 dotnet run --project ExpenseTracker.API
 ```
 
-6. Start the frontend (in a separate terminal, inside the container):
+7. Start the frontend (in a separate terminal, inside the container):
 ```bash
-cd client && ng serve --host 0.0.0.0
+cd client
+npm install --legacy-peer-deps
+ng serve --host 0.0.0.0
 ```
 
-The API will be available at `http://localhost:8080`, the frontend at `http://localhost:4200`, and Adminer (DB GUI) at `http://localhost:8081`.
+> `--legacy-peer-deps` is required due to a peer dependency mismatch — see [Known Issues](#known-issues).
+
+The API will be available at `http://localhost:8080`, the frontend at `http://localhost:4200`, Adminer (DB GUI) at `http://localhost:8081`, and Mailpit (email catcher) at `http://localhost:8025`.
 
 ---
 
@@ -164,15 +186,11 @@ The API will be available at `http://localhost:8080`, the frontend at `http://lo
 dotnet test
 ```
 
-Current coverage: **27 unit tests** across Commands, Queries, and Report aggregations.
-
 ### Frontend
 ```bash
 cd client
 npm test
 ```
-
-Current coverage: **381 tests** across components, dialogs, services, pipes, and utilities.
 
 ---
 
@@ -182,7 +200,7 @@ The solution is split by Clean Architecture layer:
 - `ExpenseTracker.API` holds Controllers, Middleware and dependency injection setup — it's the only project that talks HTTP.
 - `ExpenseTracker.Application` groups CQRS Features (Commands and Queries), DTOs, Validators, Mappers and the repository Interfaces the layer depends on.
 - `ExpenseTracker.Domain` contains just the core Entities.
-- `ExpenseTracker.Infrastructure` implements everything Application declares: Persistence (EF Core), Identity and external Services.
+- `ExpenseTracker.Infrastructure` implements everything Application declares: Persistence (EF Core), Identity, and external Services (email, JWT).
 - `client` holds the Angular frontend, complete and responsive across devices.
 - `Tests` mirrors this split with Features, Validators and Mappers test suites.
 - `.devcontainer` at the root configures the VS Code development environment.
@@ -198,6 +216,16 @@ The solution is split by Clean Architecture layer:
 - CSRF protection on refresh/revoke endpoints via double-submit cookie (XSRF-TOKEN / X-XSRF-TOKEN).
 - JWT ClockSkew set to zero for strict expiration enforcement.
 - User data fully isolated — repository queries always filter by UserId.
+- Password reset tokens are stateless (ASP.NET Identity `DataProtector`), 1-hour lifespan, single use, and automatically invalidated if the account's password changes in the meantime.
+- Password reset flow never reveals whether an email address is registered (identical response and identical error messages for existing and non-existing accounts).
+- Rate limiting on authentication endpoints (login, register, forgot-password), partitioned by client IP.
+
+---
+
+## Known Issues
+
+- Frontend dependencies require `npm install --legacy-peer-deps`: `@angular-builders/jest@21.0.4` still declares a peer dependency on the renamed `@angular-devkit/build-angular` package instead of `@angular/build`. A fix requires bumping to `@angular-builders/jest@22.x`, which targets Angular 22 — out of scope for this Angular 21.2 project.
+- `npm audit` reports a handful of moderate-severity vulnerabilities in the Jest/webpack-dev-server toolchain (transitive `uuid` dependency via the same package above). Dev-only tooling, not shipped to the production bundle.
 
 ---
 
@@ -205,10 +233,11 @@ The solution is split by Clean Architecture layer:
 
 - [x] Backend — Clean Architecture + CQRS
 - [x] Authentication with JWT + Refresh Token
+- [x] Password recovery flow (forgot/reset password)
 - [x] Backend Unit Tests
 - [x] Frontend — Angular
 - [x] Frontend Unit Tests
-- [x] Integration Tests
+- [ ] Integration Tests
 
 ---
 
