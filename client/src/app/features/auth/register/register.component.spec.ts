@@ -86,9 +86,18 @@ describe("RegisterComponent", () => {
             expect(compAny.registerForm.get('userName')?.hasError('required')).toBe(true);
         });
 
+        it("should flag email as required when empty", () => {
+            fillForm({ ...validPayload, email: '' });
+
+            const email = compAny.registerForm.get('email');
+
+            expect(email.hasError('required')).toBe(true);
+            expect(email.hasError('strictEmail')).toBe(false);
+        });
+
         it("should flag email when format is incorrect", () => {
             fillForm({ ...validPayload, email: 'test.test' });
-            expect(compAny.registerForm.get('email')?.hasError('email')).toBe(true);
+            expect(compAny.registerForm.get('email')?.hasError('strictEmail')).toBe(true);
         });
 
         //Password tests
@@ -181,7 +190,7 @@ describe("RegisterComponent", () => {
 
             compAny.register();
             //navigateByUrl is awaited inside the subscribe callback, same pattern as LoginComponent
-            await Promise.resolve();
+            await fixture.whenStable();
 
             expect(navigateByUrlSpy).toHaveBeenCalledWith('/auth/login');
             expect(compAny.registerForm.value.email).toBeFalsy();
@@ -204,6 +213,16 @@ describe("RegisterComponent", () => {
 
             expect(compAny.registerForm.value.email).toBe(validPayload.email);
         });
+
+        it("should map the backend error message for the toast", () => {
+            toastServiceMock.loading.mockReturnValue(of({}));
+            fillForm(validPayload);
+
+            compAny.register();
+
+            const { error } = toastServiceMock.loading.mock.calls[0][1];
+            expect(error({ error: { message: 'Email already in use' } })).toBe('Email already in use');
+        });
     });
 
     // ================================================
@@ -220,6 +239,17 @@ describe("RegisterComponent", () => {
             it("should be enabled when form is valid", () => {
                 fillForm(validPayload);
                 expect(getSubmitBtn().nativeElement.disabled).toBe(false);
+            });
+        });
+
+        describe("form submit", () => {
+            it("should call register() when the form emits ngSubmit", () => {
+                const registerSpy = jest.spyOn(component as any, 'register').mockImplementation();
+                fillForm(validPayload);
+
+                fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit');
+
+                expect(registerSpy).toHaveBeenCalledTimes(1);
             });
         });
 

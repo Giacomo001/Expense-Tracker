@@ -34,7 +34,7 @@
               @if (registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
                 <span class="text-white/70 text-xs">Email is required</span>
               }
-              @if (registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+              @if (registerForm.get('email')?.hasError('strictEmail') && registerForm.get('email')?.touched) {
                 <span class="text-white/70 text-xs">Invalid email format</span>
               }
             </div>
