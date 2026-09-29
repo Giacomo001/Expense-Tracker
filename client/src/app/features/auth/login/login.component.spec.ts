@@ -83,12 +83,6 @@ describe("LoginComponent", () => {
             expect(compAny.loginForm.valid).toBe(expected);
         });
 
-        it("should flag email as invalid with 'email' error on malformed value", () => {
-            fillForm('test.test', 'password');
-
-            expect(compAny.loginForm.get('email')?.hasError('email')).toBe(true);
-        });
-
         it("should flag email as invalid with 'required' error when empty", () => {
             fillForm('', 'password');
 

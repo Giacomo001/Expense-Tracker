@@ -33,11 +33,8 @@
             <mat-label>Email</mat-label>
             <mat-icon matPrefix>person</mat-icon>
             <input class="border-[var(--color-primary)]" matInput type="email" formControlName="email" placeholder="john.doe@test.test" />
-            @if (email?.hasError('required') && email?.touched) {
+            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
                 <mat-error>Email is required</mat-error>
-            }
-            @if (email?.hasError('email') && email?.touched) {
-                <mat-error>Enter a valid email address</mat-error>
             }
         </mat-form-field>
 
@@ -51,10 +48,10 @@
             >
                 <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-            @if (password?.hasError('required') && password?.touched) {
+            @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
                 <mat-error>Password is required</mat-error>
             }
-            @if (password?.hasError('minlength') && password?.touched) {
+            @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
                 <mat-error>Password must be at least 8 characters</mat-error>
             }
         </mat-form-field>
