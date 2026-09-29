@@ -27,6 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features/Auth/" />
+    <Folder Include="Features/Auth/Validators/" />
     <Folder Include="Features/Reports/" />
   </ItemGroup>
 
