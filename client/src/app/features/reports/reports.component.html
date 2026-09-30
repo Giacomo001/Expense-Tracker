@@ -1,0 +1,14 @@
+<main class="flex flex-col gap-3 p-4 overflow-y-auto bg-gray-50">
+  <div class="flex items-center justify-between">
+    <span class="text-sm font-medium text-gray-900 capitalize">
+      {{ currentMonthLabel() }}
+    </span>
+  </div>
+
+  <app-tabs />
+
+  <hr class="border-gray-200">
+
+  <app-summary />
+  <app-report-chart />
+</main>

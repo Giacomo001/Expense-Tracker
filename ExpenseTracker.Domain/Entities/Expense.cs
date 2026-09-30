@@ -14,4 +14,6 @@ public class Expense
     public Guid UserId { get; set; }
     public Guid CategoryId { get; set; }
     public Category? Category { get; set; }
+    public Guid? RecurringExpenseId { get; set; }
+    public RecurringExpense? RecurringExpense { get; set; }
 }

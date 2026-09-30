@@ -1,0 +1,88 @@
+<aside class="bg-white h-full border-l border-gray-200 p-3 overflow-y-auto flex flex-col gap-4">  
+  <!-- NAVIGATION ARROWS -->
+  <div class="flex items-center justify-between">
+    <button (click)="goToPrevMonth()" class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition-all border-none bg-transparent cursor-pointer">
+      <mat-icon class="text-secondary-light text-sm">chevron_left</mat-icon>
+    </button>
+    <span class="text-xs font-medium text-gray-900 capitalize">{{ viewMonthLabel() }}</span>
+    <button (click)="goToNextMonth()" class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition-all border-none bg-transparent cursor-pointer">
+      <mat-icon class="text-secondary-light text-sm">chevron_right</mat-icon>
+    </button>
+  </div>
+
+  <!-- PREVIOUS MONTH -->
+  <ng-container *ngTemplateOutlet="monthTemplate; context: { data: prevMonthData(), compact: true }"></ng-container>
+
+  <hr class="border-gray-200">
+
+  <!-- CURRENT MONTH -->
+  <ng-container *ngTemplateOutlet="monthTemplate; context: { data: currentMonthData(), compact: false }"></ng-container>
+
+  <hr class="border-gray-200">
+
+  <!-- NEXT MONTH -->
+  <ng-container *ngTemplateOutlet="monthTemplate; context: { data: nextMonthData(), compact: true }"></ng-container>
+
+  <hr class="border-gray-200">
+
+  <!-- NEXT TWO MONTHS -->
+  <ng-container *ngTemplateOutlet="monthTemplate; context: { data: nextTwoMonthData(), compact: true }"></ng-container>
+</aside>
+
+<!-- REUSABLE MONTH TEMPLATE -->
+<ng-template #monthTemplate let-data="data" let-compact="compact">
+  <div class="flex flex-col gap-2" [class.opacity-40]="compact">
+    <div class="flex items-center justify-between">
+      <span class="font-medium text-gray-900 capitalize"
+        [class.text-xs]="!compact"
+        [class.text-[10px]]="compact">
+        {{ data.label }}
+      </span>
+      <span class="text-secondary-light"
+        [class.text-xs]="!compact"
+        [class.text-[10px]]="compact">
+        € {{ data.total | number:'1.2-2' }}
+      </span>
+    </div>
+    <div class="grid grid-cols-7 gap-0.5">
+      @for (day of ['M','T','W','T','F','S','S']; track $index) {
+        <span class="text-center text-secondary-light py-0.5"
+          [class.text-[9px]]="!compact"
+          [class.text-[8px]]="compact">
+          {{ day }}
+        </span>
+      }
+      @for (empty of data.emptyCells; track $index) {
+        <span></span>
+      }
+      @for (day of data.calendarDays; track day.date + '-' + day.hasExpense) {
+        <div class="mx-auto rounded flex items-center justify-center relative cursor-pointer text-secondary"
+          [class.w-[22px]]="!compact"
+          [class.h-[22px]]="!compact"
+          [class.w-[20px]]="compact"
+          [class.h-[20px]]="compact"
+
+          [class.text-[10px]]="!compact"
+          [class.text-[9px]]="compact"
+          [class.bg-primary]="isSelectedDay(day.date, data.year, data.month)"
+          [class.text-white]="isSelectedDay(day.date, data.year, data.month)"
+          [class.font-medium]="isSelectedDay(day.date, data.year, data.month) && !compact"
+          [class.font-bold]="day.isToday"
+
+          [class.border]="day.isToday"
+          [class.rounded-sm]="day.isToday"
+          [class.border-primary]="day.isToday && !isSelectedDay(day.date, data.year, data.month)"
+          
+          (click)="onDayClick(day.date, data.year, data.month)">
+          {{ day.date }}
+          @if (day.hasExpense) {
+            <span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+              [class.bg-accent]="!isSelectedDay(day.date, data.year, data.month)"
+              [class.bg-white]="isSelectedDay(day.date, data.year, data.month)">
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</ng-template>

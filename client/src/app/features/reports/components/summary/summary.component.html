@@ -1,0 +1,37 @@
+<div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+  <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+    <span class="text-xs font-medium text-gray-900">Summary</span>
+    <span class="text-xs text-gray-400">last 4 months</span>
+  </div>
+
+  <div class="px-4 py-3 flex flex-col divide-y divide-gray-100">
+    @for (month of last4Months(); track month.label) {
+      <div class="flex items-center gap-3 py-2">
+        <span class="text-xs text-gray-500 w-28 flex-shrink-0 capitalize">
+          {{ month.label }}
+        </span>
+
+        <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            class="h-full rounded-full bg-[var(--color-accent)]"
+            [style.width.%]="barWidth(month.total)">
+          </div>
+        </div>
+
+        <span class="text-xs font-medium text-gray-700 w-20 text-right">
+          € {{ month.total | number:'1.2-2' }}
+        </span>
+
+        <span class="text-xs w-16 text-right"
+          [class]="month.delta === null ? 'text-gray-300' :
+                   isDeltaPositive(month.delta) ? 'text-red-500' : 'text-green-600'">
+          @if (month.delta === null) {
+            —
+          } @else {
+            {{ isDeltaPositive(month.delta) ? '+' : '' }}{{ month.delta | number:'1.2-2' }}
+          }
+        </span>
+      </div>
+    }
+  </div>
+</div>

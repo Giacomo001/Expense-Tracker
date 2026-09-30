@@ -14,18 +14,14 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        // C# e .NET
         "ms-dotnettools.csharp",
-        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csdevkit@3.10.14",
         "ms-dotnettools.vscode-dotnet-runtime",
-        // Angular e TypeScript
         "angular.ng-template",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        // Database
         "mtxr.sqltools",
         "mtxr.sqltools-driver-pg",
-        // Utilities
         "ms-azuretools.vscode-docker",
         "eamodio.gitlens"
       ],
@@ -34,14 +30,22 @@
         "[csharp]": {
           "editor.defaultFormatter": "ms-dotnettools.csharp"
         },
-        "dotnetAcquisitionExtension.sharedExistingDotnetInstallation": true
+        "dotnetAcquisitionExtension.sharedExistingDotnetInstallation": true,
+        "dotnet.defaultSolution": "/workspace/ExpenseTracker.slnx",
+        "extensions.autoUpdate": false
       }
     }
   },
 
-  "postCreateCommand": "dotnet restore /workspace/ExpenseTracker.API/ExpenseTracker.API.csproj && cd /workspace/client && npm ci && npm audit --audit-level=high",
+  "postCreateCommand": {
+    //"ssh-config": "mkdir -p /home/developer/.ssh && echo -e 'Host *\n  AddKeysToAgent yes\n  IdentityFile ~/.ssh/id_ed25519' > /home/developer/.ssh/config && chmod 600 /home/developer/.ssh/config",
+    "ssh-config": "mkdir -p /home/developer/.ssh && printf 'Host *\\n  AddKeysToAgent yes\\n  IdentityFile ~/.ssh/id_ed25519\\n' > /home/developer/.ssh/config && chmod 600 /home/developer/.ssh/config",
+    "dotnet-restore": "sudo chown -R developer:developer /home/developer/.nuget/packages && dotnet restore /workspace/ExpenseTracker.slnx",
+    "npm-install": "cd /workspace/client && npm ci --legacy-peer-deps",
+    "npm-audit": "cd /workspace/client && npm audit --audit-level=high || true"
+  },
 
-  "forwardPorts": [8080, 4200, 5432],
+  "forwardPorts": [5432],
   "portsAttributes": {
     "8080": { "label": "API" },
     "4200": { "label": "Angular" },

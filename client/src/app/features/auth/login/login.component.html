@@ -1,0 +1,86 @@
+<div class="grid grid-cols-2 h-screen">
+    <!-- LEFT PANEL -->
+    <div class="bg-primary flex flex-col justify-between px-6 py-2">
+        <div class="flex items-center gap-3">
+            <img src="cointrol-logo-dark.png" alt="Cointrol" class="h-16" />
+        </div>
+
+        <div class="flex flex-col gap-3" style="margin-bottom: -5rem;">
+            <h1 class="text-white text-3xl font-medium leading-snug">
+                Take control of your finances
+            </h1>
+            <p class="text-white/80 text-sm leading-relaxed">
+                Track expenses, manage categories and get insights
+                on your spending habits — all in one place.
+            </p>
+        </div>
+
+        <!-- CHART COMPONENT -->
+        <app-auth-charts />
+
+        <span class="text-white text-xs">© 2026 Cointrol — Expense Tracker</span>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="bg-white flex flex-col justify-center px-12 gap-8">
+        <div class="flex flex-col gap-2">
+        <h2 class="text-gray-900 text-2xl font-medium">Welcome back</h2>
+        <p class="text-gray-700 text-sm">Sign in to your account to continue</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="login()" class="flex flex-col gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input class="border-[var(--color-primary)]" matInput type="email" formControlName="email" placeholder="john.doe@test.test" />
+            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
+                <mat-error>Email is required</mat-error>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Password</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" />
+            <button mat-icon-button matSuffix 
+                type="button" (click)="hidePassword = !hidePassword"
+                data-testid="toggle-password-visibility"
+            >
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+                <mat-error>Password is required</mat-error>
+            }
+            @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
+                <mat-error>Password must be at least 8 characters</mat-error>
+            }
+        </mat-form-field>
+
+        <div class="flex justify-end -mt-2">
+            <button type="button" (click)="openForgotPasswordDialog()"
+                class="text-sm text-primary font-medium bg-transparent border-none cursor-pointer p-0">
+                Forgot password?
+            </button>
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid"
+            class="w-full h-10 bg-primary text-white rounded-lg text-sm font-medium 
+            flex items-center justify-center gap-2 cursor-pointer
+            disabled:opacity-50 disabled:cursor-not-allowed">
+            Sign in
+            <mat-icon matSuffix>arrow_forward</mat-icon>
+        </button>
+        </form>
+
+        <div class="flex items-center gap-3">
+            <span class="flex-1 h-px bg-gray-200"></span>
+            <span class="text-xs text-gray-700">Don't have an account?</span>
+            <span class="flex-1 h-px bg-gray-200"></span>
+        </div>
+
+        <div class="flex items-center justify-center gap-2">
+            <span class="text-sm text-gray-700">New to Cointrol?</span>
+            <a routerLink="/auth/register" class="text-sm text-primary font-medium">Create an account</a>
+        </div>
+    </div>
+</div>

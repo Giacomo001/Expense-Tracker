@@ -1,0 +1,48 @@
+@use 'tailwindcss';
+
+@theme {
+  /********* PRIMARY — Blue *********/
+  --color-primary: #2563eb;
+  --color-primary-light: #60a5fa;
+  --color-primary-dark: #1d4ed8;
+
+  /********* ACCENT — Cyan *********/
+  --color-accent: #0891b2;
+  --color-accent-soft: #e0f2fe;
+  --color-accent-hover: #0e7490;
+
+  /********* SECONDARY — Slate *********/
+  --color-secondary: #475569;
+  --color-secondary-light: #94a3b8;
+  --color-secondary-dark: #1e293b;
+
+  /********* NEUTRALS *********/
+  --color-background-main: #f8fafc;
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-700: #334155;
+  --color-gray-900: #0f172a;
+
+  /********* FEEDBACK *********/
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+  --color-neutral: #64748b;
+  --color-disable: #cbd5e1;
+
+  /********* FEEDBACK LIGHT *********/
+  --color-success-light: #dcfce7;
+  --color-warning-light: #fef3c7;
+  --color-error-light: #fee2e2;
+  --color-info-light: #dbeafe;
+  --color-neutral-light: #f1f5f9;
+
+  /********* SPACING *********/
+  --spacing-xs: 0.8rem;
+  --border-default: 1px solid;
+
+  /********* FONT *********/
+  --font-sans: 'Inter', sans-serif;
+}

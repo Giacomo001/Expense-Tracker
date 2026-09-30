@@ -1,0 +1,114 @@
+<div class="grid grid-cols-2 h-screen">
+    <!-- LEFT PANEL — FORM -->
+    <div class="bg-primary flex flex-col justify-between px-6 py-2">
+        <div class="flex items-center gap-3">
+            <img src="cointrol-logo-dark.png" alt="Cointrol" class="h-16" />
+        </div>
+
+        <div class="flex flex-col gap-3" style="margin-bottom: -5rem;">
+            <h2 class="text-white text-2xl font-medium">Create an account</h2>
+            <p class="text-white/80 text-sm mt-1">Fill in the details below to get started</p>
+        </div>
+
+        <div class="flex flex-col gap-6">    
+          <form [formGroup]="registerForm" (ngSubmit)="register()" class="flex flex-col gap-3">    
+            <div class="flex flex-col gap-1">
+              <label class="text-white/80 text-xs font-medium">Username</label>
+              <div class="flex items-center gap-3 px-3 h-10 rounded-lg border border-white/30 bg-white/10 focus-within:border-white focus-within:bg-white/15 transition-all">
+                <mat-icon class="text-white/60 text-base">person</mat-icon>
+                <input type="text" formControlName="userName" placeholder="johndoe"
+                  class="flex-1 bg-transparent text-white placeholder-white/80 text-sm outline-none border-none" />
+              </div>
+              @if (registerForm.get('userName')?.hasError('required') && registerForm.get('userName')?.touched) {
+                <span class="text-white/70 text-xs">Username is required</span>
+              }
+            </div>
+    
+            <div class="flex flex-col gap-1">
+              <label class="text-white/80 text-xs font-medium">Email address</label>
+              <div class="flex items-center gap-3 px-3 h-10 rounded-lg border border-white/30 bg-white/10 focus-within:border-white focus-within:bg-white/15 transition-all">
+                <mat-icon class="text-white/60 text-base">mail</mat-icon>
+                <input type="email" formControlName="email" placeholder="john.doe@example.com"
+                  class="flex-1 bg-transparent text-white placeholder-white/80 text-sm outline-none border-none" />
+              </div>
+              @if (registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
+                <span class="text-white/70 text-xs">Email is required</span>
+              }
+              @if (registerForm.get('email')?.hasError('strictEmail') && registerForm.get('email')?.touched) {
+                <span class="text-white/70 text-xs">Invalid email format</span>
+              }
+            </div>
+    
+            <div class="flex flex-col gap-1">
+              <label class="text-white/80 text-xs font-medium">Password</label>
+              <div class="flex items-center gap-3 px-3 h-10 rounded-lg border border-white/30 bg-white/10 focus-within:border-white focus-within:bg-white/15 transition-all">
+                <mat-icon class="text-white/60 text-base">lock</mat-icon>
+                <input [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+                  class="flex-1 bg-transparent text-white placeholder-white/80 text-sm outline-none border-none" />
+                <button 
+                  type="button" 
+                  (click)="hidePassword = !hidePassword" 
+                  class="text-white/60 hover:text-white"
+                  data-testid="toggle-password-visibility">
+                  <mat-icon class="text-base">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </div>
+              @if (registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
+                <span class="text-white/70 text-xs">Password is required</span>
+              }
+              @if (registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
+                <span class="text-white/70 text-xs">Password must be at least 8 characters</span>
+              }
+              @if (registerForm.get('password')?.hasError('pattern') && registerForm.get('password')?.touched) {
+                <span class="text-white/70 text-xs">Password must contain uppercase, lowercase and a number</span>
+              }
+            </div>
+    
+            <div class="flex flex-col gap-1">
+              <label class="text-white/80 text-xs font-medium">Confirm password</label>
+              <div class="flex items-center gap-3 px-3 h-10 rounded-lg border border-white/30 bg-white/10 focus-within:border-white focus-within:bg-white/15 transition-all">
+                <mat-icon class="text-white/60 text-base">lock_outline</mat-icon>
+                <input [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword"
+                  class="flex-1 bg-transparent text-white placeholder-white/80 text-sm outline-none border-none" />
+                <button 
+                  type="button" 
+                  (click)="hideConfirmPassword = !hideConfirmPassword" 
+                  class="text-white/60 hover:text-white"
+                  data-testid="toggle-confirm-password-visibility">
+                  <mat-icon class="text-base">{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </div>
+              @if (registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched) {
+                <span class="text-white/70 text-xs">Please confirm your password</span>
+              }
+              @if (registerForm.get('confirmPassword')?.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched) {
+                <span class="text-white/70 text-xs">Passwords do not match</span>
+              }
+            </div>
+    
+            <button type="submit" [disabled]="registerForm.invalid"
+              class="w-full h-10 bg-white text-primary rounded-lg text-sm font-medium 
+              flex items-center justify-center gap-2 cursor-pointer
+              disabled:opacity-50 disabled:cursor-not-allowed mt-2">
+              Create account
+              <mat-icon class="text-base">arrow_forward</mat-icon>
+            </button>
+          </form>
+    
+          <div class="flex items-center gap-3">
+            <span class="flex-1 h-px bg-white/50"></span>
+            <span class="text-xs text-white/90">Already have an account?</span>
+            <span class="flex-1 h-px bg-white/50"></span>
+          </div>
+    
+          <div class="flex items-center justify-center gap-2">
+            <span class="text-sm text-white/70">Already a member?</span>
+            <a routerLink="/auth/login" class="text-sm text-white font-medium">Sign in</a>
+          </div>
+        </div>
+        <span class="text-white text-xs">© 2026 Cointrol — Expense Tracker</span>
+      </div>
+    
+      <!-- RIGHT PANEL — SECURITY -->
+      <app-register-security-panel />
+</div>

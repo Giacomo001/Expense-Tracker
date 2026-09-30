@@ -1,0 +1,66 @@
+.skeleton-container {
+  width: 100%;
+  padding: 0;
+}
+
+//HEADER
+.skeleton-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 2rem;
+  border-bottom: 0.06rem solid var(--color-accent-soft);
+}
+
+.skeleton-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.skeleton-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+//TABELLA
+.skeleton-table {
+  width: 100%;
+  border-top: 0.06rem solid var(--color-accent);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 0.1rem solid var(--color-gray-100);
+  padding: 0 1.5rem;
+
+  //Header row — sfondo e padding replicano mat-header-cell
+  &--header {
+    background-color: var(--color-gray-50);
+    padding: 1.5rem;
+    border-bottom: 0.1rem solid var(--color-accent-soft);
+  }
+}
+
+.skeleton-cell {
+  //Ogni cella occupa lo stesso spazio — flex: 1 distribuisce equamente
+  flex: 1;
+  padding: 1.8rem 0;
+}
+
+//PAGINATOR
+.skeleton-paginator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.skeleton-paginator-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

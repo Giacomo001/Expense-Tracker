@@ -6,6 +6,7 @@ obj/
 .vs/
 *.log
 TestResults/
+*.lscache
 
 # .NET secrets
 **/appsettings.Development.json
@@ -14,6 +15,8 @@ TestResults/
 # Environment variables
 .env
 .env.container
+!.env.example
+!.env.container.example
 
 # Angular
 client/node_modules/
@@ -26,3 +29,4 @@ client/.angular/cache/
 # OS
 .DS_Store
 Thumbs.db
+ExpenseTracker.API/appsettings.json

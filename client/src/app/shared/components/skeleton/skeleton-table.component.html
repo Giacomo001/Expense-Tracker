@@ -1,0 +1,78 @@
+<section class="skeleton-container">
+
+  <!-- HEADER — it replicates app-table-header -->
+  <div class="skeleton-header">
+    <div class="skeleton-header-left">
+      <ngx-skeleton-loader
+        [theme]="{ height: '20px', width: '80px', marginBottom: '8px' }"
+        appearance="line"
+      />
+      <ngx-skeleton-loader
+        [theme]="{ height: '28px', width: '220px', marginBottom: '0' }"
+        appearance="line"
+      />
+    </div>
+    <div class="skeleton-header-right">
+      <ngx-skeleton-loader
+        [theme]="{ height: '40px', width: '200px', marginBottom: '0' }"
+        appearance="line"
+      />
+      <ngx-skeleton-loader
+        [theme]="{ height: '40px', width: '120px', marginBottom: '0' }"
+        appearance="line"
+      />
+    </div>
+  </div>
+
+  <!-- TABELLA -->
+  <div class="skeleton-table">
+
+    <!-- HEADER ROW — It replicates the 'th' of the table -->
+    <div class="skeleton-row skeleton-row--header">
+      @for (col of columnsArray(); track $index) {
+        <div class="skeleton-cell">
+          <ngx-skeleton-loader
+            [theme]="{ height: '14px', width: '70%', marginBottom: '0' }"
+            appearance="line"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- DATA ROWS — data rows -->
+    @for (row of rowsArray(); track $index; let rowIndex = $index) {
+      <div class="skeleton-row" [class.skeleton-row--even]="rowIndex % 2 === 0">
+        @for (col of columnsArray(); track $index; let colIndex = $index) {
+          <div class="skeleton-cell">
+            <ngx-skeleton-loader
+              [theme]="{ height: '16px', width: precomputedWidths()[rowIndex][colIndex], marginBottom: '0' }"
+              appearance="line"
+            />
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- PAGINATOR -->
+  <div class="skeleton-paginator">
+    <ngx-skeleton-loader
+      [theme]="{ height: '32px', width: '180px', marginBottom: '0' }"
+      appearance="line"
+    />
+    <div class="skeleton-paginator-right">
+      <ngx-skeleton-loader
+        [theme]="{ height: '32px', width: '120px', marginBottom: '0' }"
+        appearance="line"
+      />
+      <ngx-skeleton-loader
+        [theme]="{ height: '32px', width: '32px', marginBottom: '0' }"
+        appearance="line"
+      />
+      <ngx-skeleton-loader
+        [theme]="{ height: '32px', width: '32px', marginBottom: '0' }"
+        appearance="line"
+      />
+    </div>
+  </div>
+</section>

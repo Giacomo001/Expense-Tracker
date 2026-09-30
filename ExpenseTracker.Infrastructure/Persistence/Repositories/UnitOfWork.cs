@@ -11,9 +11,11 @@ public class UnitOfWork(
     ILogger<UnitOfWork> logger
     ) : IUnitOfWork
 {
+    public IBudgetRepository Budgets { get; } = new BudgetRepository(context);
     public ICategoryRepository Categories { get; } = new CategoryRepository(context);
-
     public IExpenseRepository Expenses { get; } = new ExpenseRepository(context);
+    public IRecurringExpenseRepository RecurringExpenses { get; } = new RecurringExpenseRepository(context);
+    public IRefreshTokenRepository Tokens { get; } = new RefreshTokenRepository(context);
 
     public async Task<bool> Complete(CancellationToken token = default)
     {

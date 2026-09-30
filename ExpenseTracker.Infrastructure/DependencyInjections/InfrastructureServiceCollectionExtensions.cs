@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using ExpenseTracker.Infrastructure.Identity;
 using ExpenseTracker.Application.Interfaces.Repositories;
 using ExpenseTracker.Infrastructure.Persistence.Repositories;
+using ExpenseTracker.Application.Interfaces.Services;
+using ExpenseTracker.Infrastructure.Services;
+using ExpenseTracker.Infrastructure.Services.Email;
 
 namespace ExpenseTracker.Infrastructure.DependencyInjections;
 
@@ -16,7 +19,7 @@ public static class InfrastructureServiceCollectionExtensions
     {
         services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-        object value = services.AddIdentity<User, IdentityRole<Guid>>(opt =>
+        services.AddIdentityCore<User>(opt =>
         {
             //Password
             opt.Password.RequireDigit = true;
@@ -26,7 +29,7 @@ public static class InfrastructureServiceCollectionExtensions
             opt.Password.RequireLowercase = true;
             opt.Password.RequiredUniqueChars = 6;
 
-            //Lockout
+            //Lockout after 5 tries
             opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             opt.Lockout.MaxFailedAccessAttempts = 5;
             opt.Lockout.AllowedForNewUsers = true;
@@ -34,8 +37,29 @@ public static class InfrastructureServiceCollectionExtensions
             //User
             opt.User.RequireUniqueEmail = true;
         })
+        .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddTokenProvider<DataProtectorTokenProvider<User>>("PasswordReset")
+        .AddSignInManager();
+
+        //Password Reset Token
+        services.Configure<DataProtectionTokenProviderOptions>("PasswordReset", opt =>
+        {
+            opt.TokenLifespan = TimeSpan.FromHours(1);
+        });
+
+        //Tells Identity to use "PasswordReset" as the default provider for every reset password operations (Generate + Verify/Reset)
+        services.Configure<IdentityOptions>(opt =>
+        {
+            opt.Tokens.PasswordResetTokenProvider = "PasswordReset";
+        });
+
+        //Email
+        services.AddOptions<EmailSettings>()
+            .Bind(configuration.GetSection(EmailSettings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart(); //The software doesn't start if Host or Username are missing
 
         //UnitOfWork
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -43,6 +67,14 @@ public static class InfrastructureServiceCollectionExtensions
         //Repositories Injection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
+        services.AddScoped<IRecurringExpenseRepository, RecurringExpenseRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+        //Services Injection
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IReportGeneratorService, ReportGeneratorService>();   
 
         return services;
     }

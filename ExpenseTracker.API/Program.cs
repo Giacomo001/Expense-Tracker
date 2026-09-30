@@ -1,34 +1,50 @@
+using ExpenseTracker.API.DependencyInjections;
+using ExpenseTracker.API.Middleware;
+using ExpenseTracker.Application.DependencyInjections;
+using ExpenseTracker.Infrastructure.DependencyInjections;
+using Scalar.AspNetCore;
+using QuestPDF.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddApi(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApiRateLimiting(builder.Environment);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevelopmentPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
 
-var summaries = new[]
+if (app.Environment.IsDevelopment())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-});
+app.UseMiddleware<ExceptionsHandlingMiddleware>();
+
+app.UseCors("DevelopmentPolicy");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+//API Limiter
+app.UseRateLimiter();
+
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/ExpenseTracker.API/ExpenseTracker.API.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "ng serve",
+      "command": "ng",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "args": [
+        "serve",
+        "--host", "0.0.0.0",
+        "--poll", "2000"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "angular",
+        "pattern": {
+          "regexp": "^ERROR in (.*)$",
+          "file": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Local:.*4200"
+        }
+      }
+    },
+    {
+      "label": "kill-ng-serve",
+      "type": "shell",
+      "command": "pkill -f 'ng serve' || true",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

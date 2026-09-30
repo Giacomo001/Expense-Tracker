@@ -1,0 +1,35 @@
+using System;
+using System.Security.Claims;
+using ExpenseTracker.Application.DTOs;
+using ExpenseTracker.Application.Features.Reports.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ExpenseTracker.API.Controllers;
+
+[Authorize]
+public class ReportsController(IMediator mediator) : BaseApiController
+{
+    [HttpGet]
+    public async Task<IActionResult> GetSummary([FromQuery] DateOnly from, [FromQuery] DateOnly to, CancellationToken token)
+    {
+        var result = await mediator.Send(new GetExpensesSummaryQuery(UserId, from, to), token);
+
+        return result.Match(
+            summary => Ok(summary),
+            errors => Problem(errors)
+        );
+    }
+
+    [HttpPost("export")]
+    public async Task<IActionResult> ExportPdf([FromBody] ReportPdfRequestDto dto, CancellationToken token)
+    {
+        var result = await mediator.Send(new GenerateReportPdfQuery(dto, UserId), token);
+
+        return result.Match(
+            pdf => File(pdf, "application/pdf", $"report-{dto.View}-{dto.Year}-{dto.Month}.pdf"),
+            errors => Problem(errors)
+        );
+    }
+}

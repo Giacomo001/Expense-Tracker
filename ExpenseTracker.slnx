@@ -1,7 +1,5 @@
 <Solution>
-  <Folder Name="/Tests/">
-    <Project Path="Tests/ExpenseTracker.Tests.csproj" />
-  </Folder>
+  <Project Path="Tests/ExpenseTracker.Tests.csproj" />
   <Project Path="ExpenseTracker.API/ExpenseTracker.API.csproj" />
   <Project Path="ExpenseTracker.Application/ExpenseTracker.Application.csproj" />
   <Project Path="ExpenseTracker.Domain/ExpenseTracker.Domain.csproj" />

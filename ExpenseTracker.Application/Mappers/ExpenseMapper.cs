@@ -16,7 +16,8 @@ public static class ExpenseMapper
             Date: expense.Date,
             CreatedAt: expense.CreatedAt,
             CategoryId: expense.CategoryId,
-            CategoryName: expense.Category?.Name ?? string.Empty
+            CategoryName: expense.Category?.Name ?? string.Empty,
+            CategoryColor: expense.Category?.Color ?? "#94A3B8"
         );
     }
 
