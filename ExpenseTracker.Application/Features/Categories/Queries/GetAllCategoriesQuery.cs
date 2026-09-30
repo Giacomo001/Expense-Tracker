@@ -11,8 +11,7 @@ namespace ExpenseTracker.Application.Features.Categories.Queries;
 public record GetAllCategoriesQuery(Guid UserId) : IRequest<ErrorOr<IReadOnlyList<CategoryReadDto>>>;
 
 //Handles the GetAllCategoriesQuery and returns a read-only list of CategoryReadDto
-public class GetAllCategoriesHandler(IUnitOfWork uow)
-    : IRequestHandler<GetAllCategoriesQuery, ErrorOr<IReadOnlyList<CategoryReadDto>>>
+public class GetAllCategoriesHandler(IUnitOfWork uow) : IRequestHandler<GetAllCategoriesQuery, ErrorOr<IReadOnlyList<CategoryReadDto>>>
 {
     public async Task<ErrorOr<IReadOnlyList<CategoryReadDto>>> Handle(
         GetAllCategoriesQuery request,

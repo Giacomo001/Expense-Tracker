@@ -1,0 +1,61 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C# Backend",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/ExpenseTracker.API/bin/Debug/net10.0/ExpenseTracker.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/ExpenseTracker.API",
+      "stopAtEntry": false,
+      "launchSettingsProfile": "container",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://0.0.0.0:8080"
+      }
+    },
+    {
+      "name": "Angular Frontend (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "ng serve",
+      "postDebugTask": "kill-ng-serve",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/client",
+      "sourceMaps": true,
+      "pauseForSourceMap": true,
+      "sourceMapPathOverrides": {
+        "/workspace/client/*": "${workspaceFolder}/client/*"
+      }
+    },
+    {
+      "name": "Angular Frontend (Chrome - Incognito)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "ng serve",
+      "postDebugTask": "kill-ng-serve",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/client",
+      "sourceMaps": true,
+      "pauseForSourceMap": true,
+      "sourceMapPathOverrides": {
+        "/workspace/client/*": "${workspaceFolder}/client/*"
+      },
+      "runtimeArgs": ["--incognito"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack Debug",
+      "configurations": ["C# Backend", "Angular Frontend (Chrome)"],
+      "stopAll": true
+    },
+    {
+      "name": "Full Stack Debug (Incognito)",
+      "configurations": ["C# Backend", "Angular Frontend (Chrome - Incognito)"],
+      "stopAll": true
+    }
+  ]
+}

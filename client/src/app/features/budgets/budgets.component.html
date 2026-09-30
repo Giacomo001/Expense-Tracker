@@ -1,0 +1,111 @@
+<main class="flex flex-col gap-3 p-4 overflow-y-auto bg-[var(--color-gray-50)] grow">
+  <div class="flex items-center justify-between">
+    <span class="text-sm font-medium text-[var(--color-gray-900)] capitalize">{{ currentMonthLabel() }}</span>
+  </div>
+
+  <!-- TABS -->
+  <app-tabs />
+
+  <hr class="border-[var(--color-gray-200)]">
+
+  @if (categoriesWithBudget().length === 0) {
+    <div class="flex flex-col items-center justify-center flex-1 gap-3 py-16 text-center">
+      <div class="w-12 h-12 rounded-xl bg-info-light flex items-center justify-center">
+        <mat-icon class="text-primary">account_balance_wallet</mat-icon>
+      </div>
+      <p class="text-sm font-medium text-[var(--color-gray-900)]">No categories found</p>
+      <p class="text-xs text-secondary-light">Add a category first to set a budget</p>
+    </div>
+  } @else {
+    <div class="flex flex-col gap-2">
+      @for (item of categoriesWithBudget(); track item.id) {
+        <div class="bg-white border border-[var(--color-gray-200)] rounded-lg px-3 py-2 flex items-center gap-3 group
+          hover:border-primary-light transition-all"
+          [class.border-primary-light]="editingCategoryId() === item.id">
+
+          <!-- COLOR DOT -->
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            [style.background-color]="item.color + '20'">
+            <span class="w-3 h-3 rounded-full" [style.background-color]="item.color"></span>
+          </div>
+
+          <!-- CATEGORY NAME -->
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-medium text-[var(--color-gray-900)] truncate">{{ item.name }}</p>
+            @if (item.budget) {
+              <!-- PROGRESS BAR -->
+              <div class="mt-1 h-1 w-full bg-[var(--color-gray-100)] rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300"
+                  [style.width.%]="item.percentage"
+                  [style.background-color]="item.isOverBudget ? 'var(--color-error)' : item.color">
+                </div>
+              </div>
+              <p class="text-[11px] mt-0.5" [class]="item.isOverBudget ? 'text-error' : 'text-secondary-light'">
+                € {{ item.spent | number:'1.2-2' }} / € {{ item.budget.amount | number:'1.2-2' }}
+              </p>
+            } @else {
+              <p class="text-[11px] text-secondary-light mt-0.5">No budget set</p>
+            }
+          </div>
+
+          <!-- BUDGET AMOUNT / INLINE INPUT -->
+          @if (editingCategoryId() === item.id) {
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="text-xs text-secondary-light">€</span>
+              <input
+                data-testid="budget-amount-input"
+                type="number"
+                min="0"
+                [value]="editingAmount()"
+                (input)="editingAmount.set(+$any($event.target).value)"
+                class="w-24 px-2 py-1 text-xs border border-[var(--color-gray-200)] rounded-lg focus:outline-none
+                  focus:border-[var(--color-accent)] text-[var(--color-gray-900)]"
+                (keydown.enter)="saveBudget(item.id, item.budget)"
+                (keydown.escape)="cancelEdit()">
+              <button type="button" (click)="saveBudget(item.id, item.budget)"
+                data-testid="save-budget-btn"
+                class="w-6 h-6 flex items-center justify-center rounded
+                  bg-[var(--color-accent)] border-none cursor-pointer">
+                <mat-icon style="color: white; font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">check</mat-icon>
+              </button>
+              <button type="button" (click)="cancelEdit()"
+                data-testid="cancel-edit-btn"
+                class="w-6 h-6 flex items-center justify-center rounded
+                  hover:bg-[var(--color-gray-100)] border-none bg-transparent cursor-pointer">
+                <mat-icon style="color: var(--color-secondary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">close</mat-icon>
+              </button>
+            </div>
+          } @else {
+            <div class="flex items-center gap-3 flex-shrink-0">
+              @if (item.budget) {
+                <span class="text-sm font-medium text-[var(--color-gray-700)]">
+                  € {{ item.budget.amount | number:'1.2-2' }}
+                </span>
+              }
+              <div class="flex lg:hidden lg:group-hover:flex items-center gap-1 flex-shrink-0">
+                <button type="button"
+                  data-testid="edit-or-add-budget-btn"
+                  (click)="startEditing(item.id, item.budget?.amount ?? null)"
+                  class="w-5 h-5 flex items-center justify-center rounded
+                    hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
+                  <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">
+                    {{ item.budget ? 'edit' : 'add' }}
+                  </mat-icon>
+                </button>
+                @if (item.budget) {
+                  <button type="button"
+                    data-testid="delete-budget-btn"
+                    (click)="deleteBudget(item.budget)"
+                    class="w-5 h-5 flex items-center justify-center rounded
+                      hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
+                    <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</main>

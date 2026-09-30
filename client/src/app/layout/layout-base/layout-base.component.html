@@ -1,0 +1,65 @@
+<div class="relative flex flex-col h-screen overflow-hidden lg:grid lg:grid-cols-[13.75rem_1fr_13.75rem]">
+  <!-- ===== MOBILE/TABLET TOP BAR ===== -->
+  <div class="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-[var(--color-gray-200)] shrink-0">
+    <!-- Categories toggle -->
+    <button (click)="toggleCategories()"
+      class="flex items-center gap-2 text-sm text-secondary font-medium px-3 py-1.5 rounded-lg border border-[var(--color-gray-200)] hover:bg-[var(--color-gray-50)] transition-all bg-transparent cursor-pointer">
+      <mat-icon class="text-base" style="font-size: 1.1rem; width: 1.1rem; height: 1.1rem;">category</mat-icon>
+      Categories
+    </button>
+
+    <!-- Calendar toggle -->
+    <button (click)="toggleCalendar()"
+      class="flex items-center gap-2 text-sm text-secondary font-medium px-3 py-1.5 rounded-lg border border-[var(--color-gray-200)] hover:bg-[var(--color-gray-50)] transition-all bg-transparent cursor-pointer">
+      Calendar
+      <mat-icon class="text-base" style="font-size: 1.1rem; width: 1.1rem; height: 1.1rem;">calendar_month</mat-icon>
+    </button>
+  </div>
+
+  <!-- ===== OVERLAY (mobile/tablet) ===== -->
+  @if (isCategoriesOpen() || isCalendarOpen()) {
+    <div class="lg:hidden fixed inset-0 bg-black/30 z-20"
+      (click)="closeCategories(); closeCalendar()">
+    </div>
+  }
+
+  <!-- ===== LEFT DRAWER — CATEGORIES ===== -->
+  <!-- Mobile/tablet: absolute drawer -->
+  <div class="lg:hidden fixed top-0 left-0 h-full w-[13.75rem] z-30 transform transition-transform duration-300 ease-in-out"
+    [class.-translate-x-full]="!isCategoriesOpen()"
+    [class.translate-x-0]="isCategoriesOpen()">
+    <!-- Closes the categories drawer when a category is chosen -->
+    <app-categories (categorySelected)="selectedCategoryId.set($event); closeCategories()">
+    </app-categories>
+  </div>
+
+  <!-- Desktop: normal left column -->
+  <div class="hidden lg:block">
+    <app-categories (categorySelected)="selectedCategoryId.set($event)">
+    </app-categories>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="flex-1 overflow-y-auto min-w-0 flex flex-col">
+    <router-outlet />
+  </div>
+
+  <!-- ===== RIGHT DRAWER — CALENDAR ===== -->
+  <!-- Mobile/tablet: absolute drawer -->
+  <div class="lg:hidden fixed top-0 right-0 h-full w-[13.75rem] z-30 transform transition-transform duration-300 ease-in-out"
+    [class.translate-x-full]="!isCalendarOpen()"
+    [class.translate-x-0]="isCalendarOpen()">
+    <app-calendar
+      (dateSelected)="onDateSelected($event); closeCalendar()"
+      (monthSelected)="onMonthChanged($event)">
+    </app-calendar>
+  </div>
+
+  <!-- Desktop: normal right column -->
+  <div class="hidden lg:block">
+    <app-calendar
+      (dateSelected)="onDateSelected($event)"
+      (monthSelected)="onMonthChanged($event)">
+    </app-calendar>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+  <aside class="bg-white h-full border-r border-[var(--color-gray-200)] flex flex-col gap-1 p-2 overflow-y-auto">
+    <span class="text-xs text-secondary-light uppercase tracking-widest px-2 mb-2">Categories</span>
+    <div (click)="selectCategory(null)"
+      class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all"
+      [class.bg-info-light]="selectedCategoryId() === null"
+      [class.border-primary-light]="selectedCategoryId() === null"
+      [class.text-primary-dark]="selectedCategoryId() === null"
+      [class.font-medium]="selectedCategoryId() === null"
+      [class.border-transparent]="selectedCategoryId() !== null"
+      [class.text-secondary]="selectedCategoryId() !== null">
+      
+      <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: var(--color-primary)"></span>
+      Default
+    </div>
+
+    @for (category of categoriesList(); track category.id) {
+      <div (click)="selectCategory(category.id)"
+        data-testid="category-row"
+        class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer border text-sm transition-all group"
+        [class.bg-info-light]="selectedCategoryId() === category.id"
+        [class.border-primary-light]="selectedCategoryId() === category.id"
+        [class.text-primary-dark]="selectedCategoryId() === category.id"
+        [class.font-medium]="selectedCategoryId() === category.id"
+        [class.border-transparent]="selectedCategoryId() !== category.id"
+        [class.text-secondary]="selectedCategoryId() !== category.id">
+
+        <span class="w-2 h-2 rounded-full flex-shrink-0" [style.background-color]="category.color"></span>
+        {{ category.name }}
+
+        <div class="flex lg:hidden lg:group-hover:flex items-center gap-1 ml-auto flex-shrink-0">
+          <button type="button"
+            data-testid="edit-category-btn"
+            (click)="openEditDialog(category); $event.stopPropagation()"
+            class="w-5 h-5 flex items-center justify-center rounded hover:bg-info-light transition-all border-none bg-transparent cursor-pointer">
+            <mat-icon style="color: var(--color-primary); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">edit</mat-icon>
+          </button>
+          <button type="button"
+            data-testid="delete-category-btn"
+            (click)="deleteCategory(category.id, category.name, title ); $event.stopPropagation()"
+            class="w-5 h-5 flex items-center justify-center rounded hover:bg-error-light transition-all border-none bg-transparent cursor-pointer">
+            <mat-icon style="color: var(--color-error); font-size: 0.9rem; width: 0.9rem; height: 0.9rem;">delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-secondary-light 
+      border border-dashed border-[var(--color-gray-200)] mt-2 cursor-pointer"
+      (click)="openCreateDialog()"
+      data-testid="add-category-div"
+      >
+      <mat-icon class="text-base">add</mat-icon>
+      Add category
+    </div>
+
+    <div class="border-t border-[var(--color-gray-200)] pt-2 mt-auto">
+      <button type="button"
+        data-testid="logout-category-btn"
+        (click)="logout()"
+        class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-error font-medium
+        hover:bg-error-light transition-all border-none bg-transparent cursor-pointer text-left">
+        <mat-icon style="color: var(--color-error);" class="text-base">logout</mat-icon>
+        Logout
+      </button>
+    </div>
+  </aside>

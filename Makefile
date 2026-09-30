@@ -24,5 +24,5 @@ BRANCH = develop
 
 push:
 	git add .
-	git commit -m "$(msg)"
+	git commit
 	git push origin $(BRANCH)

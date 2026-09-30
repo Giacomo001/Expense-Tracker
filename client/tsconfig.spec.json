@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "rootDir": ".",
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "types": ["jest", "node", "jest-preset-angular"]
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.spec.ts",
+    "setup-jest.ts"
+  ]
+}

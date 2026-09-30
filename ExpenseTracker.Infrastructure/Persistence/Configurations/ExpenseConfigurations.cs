@@ -30,9 +30,17 @@ public class ExpenseConfigurations : IEntityTypeConfiguration<Expense>
             .HasForeignKey(e => e.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Category>()
+        builder.HasOne<Category>(e => e.Category)
             .WithMany()
             .HasForeignKey(e => e.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(e => e.RecurringExpenseId)
+            .IsRequired(false);
+
+        builder.HasOne(e => e.RecurringExpense)
+            .WithMany()
+            .HasForeignKey(e => e.RecurringExpenseId)
+            .OnDelete(DeleteBehavior.SetNull); //If the RecurringExpense is deleted, the Expense MUST NOT BE DELETED. The RecurringExpenseId is just set to NULL
     }
 }

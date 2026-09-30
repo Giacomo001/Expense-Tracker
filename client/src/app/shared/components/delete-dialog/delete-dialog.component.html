@@ -1,0 +1,23 @@
+<div class="p-6 flex flex-col gap-5 w-full max-w-sm">
+  <div class="border-b border-gray-100 pb-4">
+    <h2 class="text-sm font-medium text-primary tracking-wide uppercase">Confirm deletion</h2>
+  </div>
+
+  <p class="text-sm text-gray-700 leading-relaxed">
+    Do you really want to delete the {{ data.title }} "<span class="font-medium text-gray-900">{{ data.itemName }}</span>"?
+    This action cannot be undone.
+  </p>
+
+  <div class="flex items-center justify-end gap-2">
+    <button type="button" (click)="cancel()"
+      class="px-4 h-9 rounded-lg border border-[var(--color-error)] text-sm text-error 
+      bg-white hover:bg-[var(--color-error)] hover:text-white transition-all cursor-pointer">
+      Cancel
+    </button>
+    <button type="button" (click)="confirm()"
+      class="px-4 h-9 rounded-lg text-sm text-white bg-[var(--color-accent)] 
+      hover:bg-[var(--color-accent-hover)] transition-all cursor-pointer border-none">
+      Delete
+    </button>
+  </div>
+</div>
