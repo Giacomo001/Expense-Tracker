@@ -6,6 +6,7 @@ obj/
 .vs/
 *.log
 TestResults/
+*.lscache
 
 # .NET secrets
 **/appsettings.Development.json
