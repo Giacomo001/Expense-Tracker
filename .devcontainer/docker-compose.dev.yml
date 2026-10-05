@@ -15,11 +15,9 @@ services:
       - api_obj:/workspace/ExpenseTracker.API/obj
       - client_node_modules:/workspace/client/node_modules
       - nuget_packages:/home/developer/.nuget/packages
-      - ~/.gitconfig:/home/developer/.gitconfig:ro
-      - ~/.ssh:/home/developer/.ssh
     ports:
-      - "8080:8080"
-      - "4200:4200"
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:4200:4200"
     depends_on:
       db:
         condition: service_healthy
@@ -32,7 +30,7 @@ services:
     env_file:
       - ../.env
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
@@ -47,7 +45,7 @@ services:
     container_name: expensetracker_adminer_dev
     restart: unless-stopped
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -56,8 +54,8 @@ services:
     image: axllent/mailpit
     container_name: expensetracker_mailpit_dev
     ports:
-      - "8025:8025"
-      - "1025:1025"
+      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:1025:1025"
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8025"]
       interval: 10s
